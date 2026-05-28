@@ -395,6 +395,59 @@
 
     .edit-btn:hover { background: #e8f0fb; border-color: #4D6F9C; }
 
+    /* ── Mobile ── */
+    @media (max-width: 620px) {
+      nav { padding: 8px 10px; gap: 5px; }
+
+      .nav-brand { font-size: 1.2rem; text-align: center; }
+
+      .nav-groups { width: 100%; gap: 5px; align-items: stretch; }
+
+      .nav-buttons {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        justify-content: flex-start;
+        gap: 5px;
+        padding-bottom: 2px;
+      }
+      .nav-buttons::-webkit-scrollbar { display: none; }
+
+      .nav-btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+        border-radius: 20px;
+      }
+
+      .view { padding: 14px 10px; }
+
+      .items-grid { grid-template-columns: 1fr; }
+
+      .item { min-height: 60px; padding: 10px 12px; }
+      .item label { font-size: 0.92rem; }
+
+      .actions { flex-direction: column; gap: 10px; }
+
+      .action-btn {
+        width: 100%;
+        padding: 17px 24px;
+        font-size: 1.05rem;
+        border-radius: 12px;
+      }
+
+      header h1 { font-size: 1.5rem; }
+      .section-title { font-size: 0.82rem; letter-spacing: 1px; }
+
+      .est-row { font-size: 0.82rem; padding: 8px 10px; }
+      .est-rate { display: none; }
+      .est-header-row span:nth-child(3) { display: none; }
+      .est-qty { width: 44px; }
+      .est-time { width: 58px; }
+    }
+
     /* ── Toast ── */
     #toast {
       display: none;
