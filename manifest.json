@@ -1,0 +1,19 @@
+{
+  "name": "ETM Cleaning Calculator",
+  "short_name": "ETM Calc",
+  "description": "Janitorial and window cleaning time calculator",
+  "start_url": "/ETMCleaning-Calculator/",
+  "scope": "/ETMCleaning-Calculator/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#4D6F9C",
+  "theme_color": "#4D6F9C",
+  "icons": [
+    {
+      "src": "Gemini_Generated_Image_ebruhcebruhcebru.png",
+      "sizes": "2048x2048",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

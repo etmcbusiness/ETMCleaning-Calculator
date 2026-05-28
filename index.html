@@ -6,6 +6,11 @@
   <title>ETMCleaning Calculator</title>
   <link rel="icon" type="image/png" href="Gemini_Generated_Image_ebruhcebruhcebru.png">
   <link rel="apple-touch-icon" href="Gemini_Generated_Image_ebruhcebruhcebru.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4D6F9C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ETM Calc">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1679,6 +1684,12 @@
       event.target.value = '';
     };
     reader.readAsText(file);
+  }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/ETMCleaning-Calculator/sw.js');
   }
 </script>
 
