@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ETMCleaning Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #FFFFFF;
+      color: #000000;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: #FFFFFF;
+      border-bottom: 2px solid #4D6F9C;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      flex-wrap: wrap;
+    }
+
+    .nav-brand {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #4D6F9C;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+
+    .nav-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-btn {
+      padding: 8px 18px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #999999;
+      background: transparent;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-btn.active {
+      background: #4D6F9C;
+      color: #FFFFFF;
+      border-color: #4D6F9C;
+    }
+
+    .nav-btn:not(.active):hover {
+      background: #7DA1D4;
+      color: #FFFFFF;
+      border-color: #7DA1D4;
+    }
+
+    .nav-btn-backup {
+      color: #4D6F9C;
+      border-color: #4D6F9C;
+    }
+
+    .nav-btn-backup.active {
+      background: #4D6F9C;
+      color: #FFFFFF;
+    }
+
+    .nav-btn-backup:not(.active):hover {
+      background: #4D6F9C;
+      color: #FFFFFF;
+    }
+
+    /* ── Views ── */
+    .view { display: none; padding: 24px 16px; }
+    .view.active { display: block; }
+
+    /* ── Header ── */
+    header { text-align: center; margin-bottom: 28px; }
+    header h1 { font-size: 2rem; color: #7DA1D4; letter-spacing: 1px; }
+    header p { color: #999999; margin-top: 6px; font-size: 0.9rem; }
+
+    /* ── Sections ── */
+    .form-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section {
+      background: #FFFFFF;
+      border: 1px solid #4D6F9C;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .section-title {
+      background: #4D6F9C;
+      color: #FFFFFF;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 10px 16px;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid #4D6F9C;
+      border-right: 1px solid #4D6F9C;
+      gap: 10px;
+      min-height: 58px;
+    }
+
+    .item label {
+      font-size: 0.88rem;
+      color: #000000;
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    /* ── Stepper ── */
+    .stepper { display: flex; align-items: center; flex-shrink: 0; }
+
+    .step-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .step-btn:active { transform: scale(0.92); }
+
+    .step-btn.minus {
+      background: #FFFFFF;
+      color: #4D6F9C;
+      border-radius: 8px 0 0 8px;
+      border: 1px solid #4D6F9C;
+      border-right: none;
+    }
+
+    .step-btn.minus:hover { background: #4D6F9C; color: #FFFFFF; }
+
+    .step-btn.plus {
+      background: #4D6F9C;
+      color: #FFFFFF;
+      border-radius: 0 8px 8px 0;
+      border: 1px solid #4D6F9C;
+      border-left: none;
+    }
+
+    .step-btn.plus:hover { background: #7DA1D4; }
+
+    .qty-display {
+      width: 42px;
+      height: 44px;
+      background: #FFFFFF;
+      border-top: 1px solid #9DBEED;
+      border-bottom: 1px solid #9DBEED;
+      color: #000000;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-display.editable {
+      width: 72px;
+      outline: none;
+      cursor: text;
+      text-align: center;
+    }
+
+    .qty-display.editable:focus {
+      border-top-color: #4D6F9C;
+      border-bottom-color: #4D6F9C;
+      background: #f0f6ff;
+    }
+
+    /* ── Action buttons ── */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .action-btn {
+      padding: 14px 40px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .action-btn:active { transform: scale(0.97); }
+    .btn-primary { background: #4D6F9C; color: #FFFFFF; }
+    .btn-primary:hover { background: #7DA1D4; }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: #999999;
+      border: 1px solid #999999;
+    }
+
+    .btn-secondary:hover { border-color: #7DA1D4; color: #4D6F9C; }
+
+    /* ── Business info inputs ── */
+    .biz-input {
+      width: 100%;
+      padding: 10px 12px;
+      background: #FFFFFF;
+      border: 1px solid #4D6F9C;
+      border-radius: 7px;
+      color: #000000;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .biz-input:focus { border-color: #7DA1D4; }
+
+    /* ── Estimate cards ── */
+    .est-section {
+      background: #FFFFFF;
+      border: 1px solid #4D6F9C;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .est-section-title {
+      background: #4D6F9C;
+      color: #FFFFFF;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 8px 16px;
+    }
+
+    .est-row {
+      display: flex;
+      align-items: center;
+      padding: 9px 16px;
+      border-bottom: 1px solid #9DBEED;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+
+    .est-row:last-child { border-bottom: none; }
+    .est-name { flex: 1; color: #000000; }
+    .est-qty { width: 50px; text-align: center; font-weight: 700; color: #4D6F9C; }
+    .est-rate { width: 60px; text-align: right; color: #999999; font-size: 0.8rem; }
+    .est-time { width: 70px; text-align: right; font-weight: 600; color: #000000; }
+
+    .est-header-row {
+      display: flex;
+      padding: 6px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #999999;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid #9DBEED;
+      gap: 8px;
+    }
+
+    .est-total-box {
+      background: #4D6F9C;
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: center;
+      color: #FFFFFF;
+    }
+
+    .est-total-box .lbl { font-size: 0.9rem; opacity: 0.85; margin-bottom: 6px; }
+    .est-total-box .val { font-size: 2.4rem; font-weight: 700; }
+
+    .est-empty {
+      text-align: center;
+      color: #999999;
+      padding: 32px;
+      font-size: 0.95rem;
+    }
+
+    .est-card { border: 1px solid #4D6F9C; border-radius: 10px; overflow: hidden; }
+
+    .est-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #FFFFFF;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .est-card-header:hover { background: #f0f6ff; }
+    .est-card-meta { flex: 1; }
+    .est-card-meta .ts { font-size: 0.8rem; color: #999999; }
+
+    .est-card-meta .total-pill {
+      display: inline-block;
+      background: #4D6F9C;
+      color: #FFFFFF;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-top: 3px;
+    }
+
+    .est-card-toggle { font-size: 1.2rem; color: #999999; transition: transform 0.2s; }
+    .est-card.open .est-card-toggle { transform: rotate(180deg); }
+    .est-card-body { display: none; border-top: 1px solid #9DBEED; }
+    .est-card.open .est-card-body { display: block; }
+
+    .del-btn {
+      width: 36px; height: 36px;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      background: #FFFFFF;
+      color: #999999;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .del-btn:hover { background: #fee; border-color: #c00; color: #c00; }
+
+    .edit-btn {
+      width: 36px; height: 36px;
+      border: 1px solid #9DBEED;
+      border-radius: 7px;
+      background: #FFFFFF;
+      color: #4D6F9C;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .edit-btn:hover { background: #e8f0fb; border-color: #4D6F9C; }
+
+    /* ── Toast ── */
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4D6F9C;
+      color: #FFFFFF;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <span class="nav-brand">ETM Cleaning Calculator</span>
+  <div class="nav-groups">
+    <div class="nav-buttons">
+      <button class="nav-btn active" id="nav-calc"      onclick="showView('calc',this)">Janitorial Calculator</button>
+      <button class="nav-btn"        id="nav-estimate"  onclick="showView('estimate',this)">Janitorial Estimates</button>
+      <button class="nav-btn"        id="nav-settings"  onclick="showView('settings',this)">Janitorial Settings</button>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn"        id="nav-wcalc"     onclick="showView('wcalc',this)">Window Calculator</button>
+      <button class="nav-btn"        id="nav-westimate" onclick="showView('westimate',this)">Window Estimates</button>
+      <button class="nav-btn"        id="nav-wsettings" onclick="showView('wsettings',this)">Window Settings</button>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn nav-btn-backup" id="nav-backup" onclick="showView('backup',this)">&#128190; Backup &amp; Restore</button>
+    </div>
+  </div>
+</nav>
+
+<div id="toast">Settings saved!</div>
+
+<!-- ════════════ JANITORIAL CALCULATOR ════════════ -->
+<div id="view-calc" class="view active">
+  <div class="form-wrapper">
+
+    <div class="section">
+      <div class="section-title">Business Info</div>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Business Name</label>
+          <input type="text" id="biz-name" placeholder="e.g. ETM HQ" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Address</label>
+          <input type="text" id="biz-address" placeholder="e.g. 123 Main St, Suite 400" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Square Footage</label>
+          <input type="number" id="biz-sqft" placeholder="e.g. 4500" min="0" class="biz-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Unloading</div>
+      <div class="items-grid">
+        <div class="item"><label>Unload Level 1</label><div class="stepper"><button class="step-btn minus" onclick="step('unload1',-1)">−</button><div class="qty-display" id="unload1">0</div><button class="step-btn plus" onclick="step('unload1',1)">+</button></div></div>
+        <div class="item"><label>Unload Level 2</label><div class="stepper"><button class="step-btn minus" onclick="step('unload2',-1)">−</button><div class="qty-display" id="unload2">0</div><button class="step-btn plus" onclick="step('unload2',1)">+</button></div></div>
+        <div class="item"><label>Unload Level 3</label><div class="stepper"><button class="step-btn minus" onclick="step('unload3',-1)">−</button><div class="qty-display" id="unload3">0</div><button class="step-btn plus" onclick="step('unload3',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Toilet Paper</div>
+      <div class="items-grid">
+        <div class="item"><label>Toilet Paper (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('tp_nokey',-1)">−</button><div class="qty-display" id="tp_nokey">0</div><button class="step-btn plus" onclick="step('tp_nokey',1)">+</button></div></div>
+        <div class="item"><label>Toilet Paper (Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('tp_key',-1)">−</button><div class="qty-display" id="tp_key">0</div><button class="step-btn plus" onclick="step('tp_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Paper Towels</div>
+      <div class="items-grid">
+        <div class="item"><label>Paper Towels (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('pt_nokey',-1)">−</button><div class="qty-display" id="pt_nokey">0</div><button class="step-btn plus" onclick="step('pt_nokey',1)">+</button></div></div>
+        <div class="item"><label>Paper Towels (Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('pt_key',-1)">−</button><div class="qty-display" id="pt_key">0</div><button class="step-btn plus" onclick="step('pt_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Hand Soap</div>
+      <div class="items-grid">
+        <div class="item"><label>Hand Soap Household Bottle (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('hs_household_nokey',-1)">−</button><div class="qty-display" id="hs_household_nokey">0</div><button class="step-btn plus" onclick="step('hs_household_nokey',1)">+</button></div></div>
+        <div class="item"><label>Hand Soap Large (Wall Attachment Small)</label><div class="stepper"><button class="step-btn minus" onclick="step('hs_wall_sm',-1)">−</button><div class="qty-display" id="hs_wall_sm">0</div><button class="step-btn plus" onclick="step('hs_wall_sm',1)">+</button></div></div>
+        <div class="item"><label>Hand Soap Large (Wall Attachment Large)</label><div class="stepper"><button class="step-btn minus" onclick="step('hs_wall_lg',-1)">−</button><div class="qty-display" id="hs_wall_lg">0</div><button class="step-btn plus" onclick="step('hs_wall_lg',1)">+</button></div></div>
+        <div class="item"><label>Hand Soap (Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('hs_key',-1)">−</button><div class="qty-display" id="hs_key">0</div><button class="step-btn plus" onclick="step('hs_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Toilet Seat Covers</div>
+      <div class="items-grid">
+        <div class="item"><label>Toilet Seat Covers (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('tsc_nokey',-1)">−</button><div class="qty-display" id="tsc_nokey">0</div><button class="step-btn plus" onclick="step('tsc_nokey',1)">+</button></div></div>
+        <div class="item"><label>Toilet Seat Covers (Key)</label><div class="stepper"><button class="step-btn minus" onclick="step('tsc_key',-1)">−</button><div class="qty-display" id="tsc_key">0</div><button class="step-btn plus" onclick="step('tsc_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Trash</div>
+      <div class="items-grid">
+        <div class="item"><label>Trash Cans Small</label><div class="stepper"><button class="step-btn minus" onclick="step('trash_sm',-1)">−</button><div class="qty-display" id="trash_sm">0</div><button class="step-btn plus" onclick="step('trash_sm',1)">+</button></div></div>
+        <div class="item"><label>Trash Cans Medium</label><div class="stepper"><button class="step-btn minus" onclick="step('trash_md',-1)">−</button><div class="qty-display" id="trash_md">0</div><button class="step-btn plus" onclick="step('trash_md',1)">+</button></div></div>
+        <div class="item"><label>Trash Cans Large</label><div class="stepper"><button class="step-btn minus" onclick="step('trash_lg',-1)">−</button><div class="qty-display" id="trash_lg">0</div><button class="step-btn plus" onclick="step('trash_lg',1)">+</button></div></div>
+        <div class="item"><label>Trash to Dumpster</label><div class="stepper"><button class="step-btn minus" onclick="step('trash_dumpster',-1)">−</button><div class="qty-display" id="trash_dumpster">0</div><button class="step-btn plus" onclick="step('trash_dumpster',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Dusting</div>
+      <div class="items-grid">
+        <div class="item"><label>Dusting</label><div style="font-size:0.82rem;color:#999999;padding:8px 0;font-style:italic;">Calculated from sq footage</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fixtures &amp; Furniture</div>
+      <div class="items-grid">
+        <div class="item"><label>Drinking Fountain</label><div class="stepper"><button class="step-btn minus" onclick="step('drinking_fountain',-1)">−</button><div class="qty-display" id="drinking_fountain">0</div><button class="step-btn plus" onclick="step('drinking_fountain',1)">+</button></div></div>
+        <div class="item"><label>Stone Tables Small</label><div class="stepper"><button class="step-btn minus" onclick="step('stone_sm',-1)">−</button><div class="qty-display" id="stone_sm">0</div><button class="step-btn plus" onclick="step('stone_sm',1)">+</button></div></div>
+        <div class="item"><label>Stone Tables Medium</label><div class="stepper"><button class="step-btn minus" onclick="step('stone_md',-1)">−</button><div class="qty-display" id="stone_md">0</div><button class="step-btn plus" onclick="step('stone_md',1)">+</button></div></div>
+        <div class="item"><label>Stone Tables Large</label><div class="stepper"><button class="step-btn minus" onclick="step('stone_lg',-1)">−</button><div class="qty-display" id="stone_lg">0</div><button class="step-btn plus" onclick="step('stone_lg',1)">+</button></div></div>
+        <div class="item"><label>Tables Small</label><div class="stepper"><button class="step-btn minus" onclick="step('table_sm',-1)">−</button><div class="qty-display" id="table_sm">0</div><button class="step-btn plus" onclick="step('table_sm',1)">+</button></div></div>
+        <div class="item"><label>Tables Medium</label><div class="stepper"><button class="step-btn minus" onclick="step('table_md',-1)">−</button><div class="qty-display" id="table_md">0</div><button class="step-btn plus" onclick="step('table_md',1)">+</button></div></div>
+        <div class="item"><label>Tables Large</label><div class="stepper"><button class="step-btn minus" onclick="step('table_lg',-1)">−</button><div class="qty-display" id="table_lg">0</div><button class="step-btn plus" onclick="step('table_lg',1)">+</button></div></div>
+        <div class="item"><label>Sinks</label><div class="stepper"><button class="step-btn minus" onclick="step('sinks',-1)">−</button><div class="qty-display" id="sinks">0</div><button class="step-btn plus" onclick="step('sinks',1)">+</button></div></div>
+        <div class="item"><label>Microwave</label><div class="stepper"><button class="step-btn minus" onclick="step('microwave',-1)">−</button><div class="qty-display" id="microwave">0</div><button class="step-btn plus" onclick="step('microwave',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Toilets</div>
+      <div class="items-grid">
+        <div class="item"><label>Toilets Level 1 (Skirt)</label><div class="stepper"><button class="step-btn minus" onclick="step('toilet1',-1)">−</button><div class="qty-display" id="toilet1">0</div><button class="step-btn plus" onclick="step('toilet1',1)">+</button></div></div>
+        <div class="item"><label>Toilets Level 2 (Regular)</label><div class="stepper"><button class="step-btn minus" onclick="step('toilet2',-1)">−</button><div class="qty-display" id="toilet2">0</div><button class="step-btn plus" onclick="step('toilet2',1)">+</button></div></div>
+        <div class="item"><label>Toilets Level 3 (Extra Seat Flap)</label><div class="stepper"><button class="step-btn minus" onclick="step('toilet3',-1)">−</button><div class="qty-display" id="toilet3">0</div><button class="step-btn plus" onclick="step('toilet3',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Mirrors</div>
+      <div class="items-grid">
+        <div class="item"><label>Small Mirror (Handheld)</label><div class="stepper"><button class="step-btn minus" onclick="step('mirror_sm',-1)">−</button><div class="qty-display" id="mirror_sm">0</div><button class="step-btn plus" onclick="step('mirror_sm',1)">+</button></div></div>
+        <div class="item"><label>Medium Mirror (1×1 – 2×2)</label><div class="stepper"><button class="step-btn minus" onclick="step('mirror_md',-1)">−</button><div class="qty-display" id="mirror_md">0</div><button class="step-btn plus" onclick="step('mirror_md',1)">+</button></div></div>
+        <div class="item"><label>Large Mirror (Full Body)</label><div class="stepper"><button class="step-btn minus" onclick="step('mirror_lg',-1)">−</button><div class="qty-display" id="mirror_lg">0</div><button class="step-btn plus" onclick="step('mirror_lg',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Glass Surfaces</div>
+      <div class="items-grid">
+        <div class="item"><label>Small Glass Surface (1×1)</label><div class="stepper"><button class="step-btn minus" onclick="step('glass_sm',-1)">−</button><div class="qty-display" id="glass_sm">0</div><button class="step-btn plus" onclick="step('glass_sm',1)">+</button></div></div>
+        <div class="item"><label>Medium Glass Surface (2×2)</label><div class="stepper"><button class="step-btn minus" onclick="step('glass_md',-1)">−</button><div class="qty-display" id="glass_md">0</div><button class="step-btn plus" onclick="step('glass_md',1)">+</button></div></div>
+        <div class="item"><label>Large Glass Surface (3×3+)</label><div class="stepper"><button class="step-btn minus" onclick="step('glass_lg',-1)">−</button><div class="qty-display" id="glass_lg">0</div><button class="step-btn plus" onclick="step('glass_lg',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Floors</div>
+      <div class="items-grid">
+        <div class="item"><label>Vacuuming (per 1000 SqFt)</label><div style="font-size:0.82rem;color:#999999;padding:8px 0;font-style:italic;">Calculated from sq footage</div></div>
+        <div class="item">
+          <label>Mopable Surfaces (per 1000 SqFt)</label>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+            <div style="font-size:0.82rem;color:#999999;font-style:italic;">Calculated from sq footage</div>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <label style="font-size:0.78rem;color:#999999;white-space:nowrap;">Moppable %</label>
+              <input type="number" id="mop-pct" value="100" min="0" max="100" class="biz-input" style="width:72px;text-align:center;padding:6px 8px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fill Mop Bucket</div>
+      <div class="items-grid">
+        <div class="item"><label>Fill Mop Bucket: Sink</label><div class="stepper"><button class="step-btn minus" onclick="step('bucket_sink',-1)">−</button><div class="qty-display" id="bucket_sink">0</div><button class="step-btn plus" onclick="step('bucket_sink',1)">+</button></div></div>
+        <div class="item"><label>Fill Mop Bucket: Faucet</label><div class="stepper"><button class="step-btn minus" onclick="step('bucket_faucet',-1)">−</button><div class="qty-display" id="bucket_faucet">0</div><button class="step-btn plus" onclick="step('bucket_faucet',1)">+</button></div></div>
+        <div class="item"><label>Fill Mop Bucket: Mobile</label><div class="stepper"><button class="step-btn minus" onclick="step('bucket_mobile',-1)">−</button><div class="qty-display" id="bucket_mobile">0</div><button class="step-btn plus" onclick="step('bucket_mobile',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Density</div>
+      <div class="items-grid">
+        <div class="item"><label>Density Level 1 (Compact)</label><div class="stepper"><button class="step-btn minus" onclick="step('density1',-1)">−</button><div class="qty-display" id="density1">0</div><button class="step-btn plus" onclick="step('density1',1)">+</button></div></div>
+        <div class="item"><label>Density Level 2 (Standard)</label><div class="stepper"><button class="step-btn minus" onclick="step('density2',-1)">−</button><div class="qty-display" id="density2">0</div><button class="step-btn plus" onclick="step('density2',1)">+</button></div></div>
+        <div class="item"><label>Density Level 3 (Wide-Opened)</label><div class="stepper"><button class="step-btn minus" onclick="step('density3',-1)">−</button><div class="qty-display" id="density3">0</div><button class="step-btn plus" onclick="step('density3',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn btn-primary" id="calc-btn" onclick="calculate()">Calculate</button>
+      <button class="action-btn btn-secondary" onclick="resetForm()">Reset</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════ JANITORIAL ESTIMATES ════════════ -->
+<div id="view-estimate" class="view">
+  <header>
+    <h1>Janitorial Estimates</h1>
+    <p>Tap an estimate to expand it.</p>
+  </header>
+  <div class="form-wrapper">
+    <div id="estimate-list"></div>
+    <div class="actions">
+      <button class="action-btn btn-primary" onclick="showView('calc',document.getElementById('nav-calc'))">New Estimate</button>
+      <button class="action-btn btn-secondary" id="clearAllBtn" onclick="clearAllEstimates()">Delete All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ JANITORIAL SETTINGS ════════════ -->
+<div id="view-settings" class="view">
+  <header>
+    <h1>Janitorial Settings</h1>
+    <p>Set the time in seconds each item takes per unit.</p>
+  </header>
+  <div class="form-wrapper">
+
+    <div class="section">
+      <div class="section-title">Unloading</div>
+      <div class="items-grid">
+        <div class="item"><label>Unload Level 1</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_unload1',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_unload1">0</div><button class="step-btn plus" onclick="stepSetting('s_unload1',1)">+</button></div></div>
+        <div class="item"><label>Unload Level 2</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_unload2',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_unload2">0</div><button class="step-btn plus" onclick="stepSetting('s_unload2',1)">+</button></div></div>
+        <div class="item"><label>Unload Level 3</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_unload3',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_unload3">0</div><button class="step-btn plus" onclick="stepSetting('s_unload3',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Toilet Paper</div>
+      <div class="items-grid">
+        <div class="item"><label>Toilet Paper (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_tp_nokey',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_tp_nokey">0</div><button class="step-btn plus" onclick="stepSetting('s_tp_nokey',1)">+</button></div></div>
+        <div class="item"><label>Toilet Paper (Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_tp_key',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_tp_key">0</div><button class="step-btn plus" onclick="stepSetting('s_tp_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Paper Towels</div>
+      <div class="items-grid">
+        <div class="item"><label>Paper Towels (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_pt_nokey',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_pt_nokey">0</div><button class="step-btn plus" onclick="stepSetting('s_pt_nokey',1)">+</button></div></div>
+        <div class="item"><label>Paper Towels (Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_pt_key',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_pt_key">0</div><button class="step-btn plus" onclick="stepSetting('s_pt_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Hand Soap</div>
+      <div class="items-grid">
+        <div class="item"><label>Hand Soap Household Bottle (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_hs_household_nokey',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_hs_household_nokey">0</div><button class="step-btn plus" onclick="stepSetting('s_hs_household_nokey',1)">+</button></div></div>
+        <div class="item"><label>Hand Soap Large (Wall Attachment Small)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_hs_wall_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_hs_wall_sm">0</div><button class="step-btn plus" onclick="stepSetting('s_hs_wall_sm',1)">+</button></div></div>
+        <div class="item"><label>Hand Soap Large (Wall Attachment Large)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_hs_wall_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_hs_wall_lg">0</div><button class="step-btn plus" onclick="stepSetting('s_hs_wall_lg',1)">+</button></div></div>
+        <div class="item"><label>Hand Soap (Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_hs_key',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_hs_key">0</div><button class="step-btn plus" onclick="stepSetting('s_hs_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Toilet Seat Covers</div>
+      <div class="items-grid">
+        <div class="item"><label>Toilet Seat Covers (No Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_tsc_nokey',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_tsc_nokey">0</div><button class="step-btn plus" onclick="stepSetting('s_tsc_nokey',1)">+</button></div></div>
+        <div class="item"><label>Toilet Seat Covers (Key)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_tsc_key',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_tsc_key">0</div><button class="step-btn plus" onclick="stepSetting('s_tsc_key',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Trash</div>
+      <div class="items-grid">
+        <div class="item"><label>Trash Cans Small</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_trash_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_trash_sm">0</div><button class="step-btn plus" onclick="stepSetting('s_trash_sm',1)">+</button></div></div>
+        <div class="item"><label>Trash Cans Medium</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_trash_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_trash_md">0</div><button class="step-btn plus" onclick="stepSetting('s_trash_md',1)">+</button></div></div>
+        <div class="item"><label>Trash Cans Large</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_trash_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_trash_lg">0</div><button class="step-btn plus" onclick="stepSetting('s_trash_lg',1)">+</button></div></div>
+        <div class="item"><label>Trash to Dumpster</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_trash_dumpster',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_trash_dumpster">0</div><button class="step-btn plus" onclick="stepSetting('s_trash_dumpster',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Dusting</div>
+      <div class="items-grid">
+        <div class="item"><label>Dusting (per 1000 SqFt)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_dust',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_dust">60</div><button class="step-btn plus" onclick="stepSetting('s_dust',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fixtures &amp; Furniture</div>
+      <div class="items-grid">
+        <div class="item"><label>Drinking Fountain</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_drinking_fountain',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_drinking_fountain">0</div><button class="step-btn plus" onclick="stepSetting('s_drinking_fountain',1)">+</button></div></div>
+        <div class="item"><label>Stone Tables Small</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_stone_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_stone_sm">0</div><button class="step-btn plus" onclick="stepSetting('s_stone_sm',1)">+</button></div></div>
+        <div class="item"><label>Stone Tables Medium</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_stone_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_stone_md">0</div><button class="step-btn plus" onclick="stepSetting('s_stone_md',1)">+</button></div></div>
+        <div class="item"><label>Stone Tables Large</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_stone_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_stone_lg">0</div><button class="step-btn plus" onclick="stepSetting('s_stone_lg',1)">+</button></div></div>
+        <div class="item"><label>Tables Small</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_table_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_table_sm">0</div><button class="step-btn plus" onclick="stepSetting('s_table_sm',1)">+</button></div></div>
+        <div class="item"><label>Tables Medium</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_table_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_table_md">0</div><button class="step-btn plus" onclick="stepSetting('s_table_md',1)">+</button></div></div>
+        <div class="item"><label>Tables Large</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_table_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_table_lg">0</div><button class="step-btn plus" onclick="stepSetting('s_table_lg',1)">+</button></div></div>
+        <div class="item"><label>Sinks</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_sinks',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_sinks">0</div><button class="step-btn plus" onclick="stepSetting('s_sinks',1)">+</button></div></div>
+        <div class="item"><label>Microwave</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_microwave',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_microwave">0</div><button class="step-btn plus" onclick="stepSetting('s_microwave',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Toilets</div>
+      <div class="items-grid">
+        <div class="item"><label>Toilets Level 1 (Skirt)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_toilet1',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_toilet1">0</div><button class="step-btn plus" onclick="stepSetting('s_toilet1',1)">+</button></div></div>
+        <div class="item"><label>Toilets Level 2 (Regular)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_toilet2',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_toilet2">0</div><button class="step-btn plus" onclick="stepSetting('s_toilet2',1)">+</button></div></div>
+        <div class="item"><label>Toilets Level 3 (Extra Seat Flap)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_toilet3',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_toilet3">0</div><button class="step-btn plus" onclick="stepSetting('s_toilet3',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Mirrors</div>
+      <div class="items-grid">
+        <div class="item"><label>Small Mirror (Handheld)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_mirror_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_mirror_sm">0</div><button class="step-btn plus" onclick="stepSetting('s_mirror_sm',1)">+</button></div></div>
+        <div class="item"><label>Medium Mirror (1×1 – 2×2)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_mirror_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_mirror_md">0</div><button class="step-btn plus" onclick="stepSetting('s_mirror_md',1)">+</button></div></div>
+        <div class="item"><label>Large Mirror (Full Body)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_mirror_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_mirror_lg">0</div><button class="step-btn plus" onclick="stepSetting('s_mirror_lg',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Glass Surfaces</div>
+      <div class="items-grid">
+        <div class="item"><label>Small Glass Surface (1×1)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_glass_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_glass_sm">0</div><button class="step-btn plus" onclick="stepSetting('s_glass_sm',1)">+</button></div></div>
+        <div class="item"><label>Medium Glass Surface (2×2)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_glass_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_glass_md">0</div><button class="step-btn plus" onclick="stepSetting('s_glass_md',1)">+</button></div></div>
+        <div class="item"><label>Large Glass Surface (3×3+)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_glass_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_glass_lg">0</div><button class="step-btn plus" onclick="stepSetting('s_glass_lg',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Floors</div>
+      <div class="items-grid">
+        <div class="item"><label>Vacuuming (per 1000 SqFt)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_vacuum',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_vacuum">0</div><button class="step-btn plus" onclick="stepSetting('s_vacuum',1)">+</button></div></div>
+        <div class="item"><label>Mopable Surfaces (per 1000 SqFt)</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_mop',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_mop">0</div><button class="step-btn plus" onclick="stepSetting('s_mop',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fill Mop Bucket</div>
+      <div class="items-grid">
+        <div class="item"><label>Fill Mop Bucket: Sink</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_bucket_sink',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_bucket_sink">0</div><button class="step-btn plus" onclick="stepSetting('s_bucket_sink',1)">+</button></div></div>
+        <div class="item"><label>Fill Mop Bucket: Faucet</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_bucket_faucet',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_bucket_faucet">0</div><button class="step-btn plus" onclick="stepSetting('s_bucket_faucet',1)">+</button></div></div>
+        <div class="item"><label>Fill Mop Bucket: Mobile</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_bucket_mobile',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_bucket_mobile">0</div><button class="step-btn plus" onclick="stepSetting('s_bucket_mobile',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Density Multipliers</div>
+      <div style="padding:6px 16px 2px;font-size:0.78rem;color:#999999;">Multiplied against vacuum &amp; mop time</div>
+      <div class="items-grid">
+        <div class="item"><label>Level 1 – Compact</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_density1',-0.1)">−</button><div class="qty-display editable" contenteditable="true" id="s_density1">1.75</div><button class="step-btn plus" onclick="stepSetting('s_density1',0.1)">+</button></div></div>
+        <div class="item"><label>Level 2 – Standard</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_density2',-0.1)">−</button><div class="qty-display editable" contenteditable="true" id="s_density2">1</div><button class="step-btn plus" onclick="stepSetting('s_density2',0.1)">+</button></div></div>
+        <div class="item"><label>Level 3 – Wide-Opened</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_density3',-0.1)">−</button><div class="qty-display editable" contenteditable="true" id="s_density3">0.85</div><button class="step-btn plus" onclick="stepSetting('s_density3',0.1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════ WINDOW CALCULATOR ════════════ -->
+<div id="view-wcalc" class="view">
+  <div class="form-wrapper">
+
+    <div class="section">
+      <div class="section-title">Business Info</div>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Business Name</label>
+          <input type="text" id="w-biz-name" placeholder="e.g. ETM HQ" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Address</label>
+          <input type="text" id="w-biz-address" placeholder="e.g. 123 Main St, Suite 400" class="biz-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Setup</div>
+      <div class="items-grid">
+        <div class="item"><label>Setup / Unload</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_setup',-1)">−</button><div class="qty-display" id="w_setup">0</div><button class="step-btn plus" onclick="wStep('w_setup',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Interior Windows</div>
+      <div class="items-grid">
+        <div class="item"><label>Interior Small 1x1</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_int_sm',-1)">−</button><div class="qty-display" id="w_int_sm">0</div><button class="step-btn plus" onclick="wStep('w_int_sm',1)">+</button></div></div>
+        <div class="item"><label>Interior Medium 2x2</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_int_md',-1)">−</button><div class="qty-display" id="w_int_md">0</div><button class="step-btn plus" onclick="wStep('w_int_md',1)">+</button></div></div>
+        <div class="item"><label>Interior Large 3x3</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_int_lg',-1)">−</button><div class="qty-display" id="w_int_lg">0</div><button class="step-btn plus" onclick="wStep('w_int_lg',1)">+</button></div></div>
+        <div class="item"><label>Interior XLarge 4x4+</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_int_xl',-1)">−</button><div class="qty-display" id="w_int_xl">0</div><button class="step-btn plus" onclick="wStep('w_int_xl',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Exterior Windows</div>
+      <div class="items-grid">
+        <div class="item"><label>Exterior Small 1x1</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ext_sm',-1)">−</button><div class="qty-display" id="w_ext_sm">0</div><button class="step-btn plus" onclick="wStep('w_ext_sm',1)">+</button></div></div>
+        <div class="item"><label>Exterior Medium 2x2</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ext_md',-1)">−</button><div class="qty-display" id="w_ext_md">0</div><button class="step-btn plus" onclick="wStep('w_ext_md',1)">+</button></div></div>
+        <div class="item"><label>Exterior Large 3x3</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ext_lg',-1)">−</button><div class="qty-display" id="w_ext_lg">0</div><button class="step-btn plus" onclick="wStep('w_ext_lg',1)">+</button></div></div>
+        <div class="item"><label>Exterior XLarge 4x4+</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ext_xl',-1)">−</button><div class="qty-display" id="w_ext_xl">0</div><button class="step-btn plus" onclick="wStep('w_ext_xl',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Specialty Windows</div>
+      <div class="items-grid">
+        <div class="item"><label>French Pane (per pane)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_french_pane',-1)">−</button><div class="qty-display" id="w_french_pane">0</div><button class="step-btn plus" onclick="wStep('w_french_pane',1)">+</button></div></div>
+        <div class="item"><label>Skylight</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_skylight',-1)">−</button><div class="qty-display" id="w_skylight">0</div><button class="step-btn plus" onclick="wStep('w_skylight',1)">+</button></div></div>
+        <div class="item"><label>Transom Window</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_transom',-1)">−</button><div class="qty-display" id="w_transom">0</div><button class="step-btn plus" onclick="wStep('w_transom',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Glass Doors</div>
+      <div class="items-grid">
+        <div class="item"><label>Glass Door (Single)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_glass_door',-1)">−</button><div class="qty-display" id="w_glass_door">0</div><button class="step-btn plus" onclick="wStep('w_glass_door',1)">+</button></div></div>
+        <div class="item"><label>Sliding Glass Door</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_sliding_door',-1)">−</button><div class="qty-display" id="w_sliding_door">0</div><button class="step-btn plus" onclick="wStep('w_sliding_door',1)">+</button></div></div>
+        <div class="item"><label>Storefront Door</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_storefront_door',-1)">−</button><div class="qty-display" id="w_storefront_door">0</div><button class="step-btn plus" onclick="wStep('w_storefront_door',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Screens</div>
+      <div class="items-grid">
+        <div class="item"><label>Screen Small 1x1</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_screen_sm',-1)">−</button><div class="qty-display" id="w_screen_sm">0</div><button class="step-btn plus" onclick="wStep('w_screen_sm',1)">+</button></div></div>
+        <div class="item"><label>Screen Medium 2x2</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_screen_md',-1)">−</button><div class="qty-display" id="w_screen_md">0</div><button class="step-btn plus" onclick="wStep('w_screen_md',1)">+</button></div></div>
+        <div class="item"><label>Screen Large 3x3</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_screen_lg',-1)">−</button><div class="qty-display" id="w_screen_lg">0</div><button class="step-btn plus" onclick="wStep('w_screen_lg',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Tracks &amp; Frames</div>
+      <div class="items-grid">
+        <div class="item"><label>Track Cleaning</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_track',-1)">−</button><div class="qty-display" id="w_track">0</div><button class="step-btn plus" onclick="wStep('w_track',1)">+</button></div></div>
+        <div class="item"><label>Frame Wipe</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_frame',-1)">−</button><div class="qty-display" id="w_frame">0</div><button class="step-btn plus" onclick="wStep('w_frame',1)">+</button></div></div>
+        <div class="item"><label>Sill Wipe</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_sill',-1)">−</button><div class="qty-display" id="w_sill">0</div><button class="step-btn plus" onclick="wStep('w_sill',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Access</div>
+      <div class="items-grid">
+        <div class="item"><label>Step Ladder (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ladder_step',-1)">−</button><div class="qty-display" id="w_ladder_step">0</div><button class="step-btn plus" onclick="wStep('w_ladder_step',1)">+</button></div></div>
+        <div class="item"><label>Extension Ladder (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ladder_ext',-1)">−</button><div class="qty-display" id="w_ladder_ext">0</div><button class="step-btn plus" onclick="wStep('w_ladder_ext',1)">+</button></div></div>
+        <div class="item"><label>Aerial Lift (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_lift',-1)">−</button><div class="qty-display" id="w_lift">0</div><button class="step-btn plus" onclick="wStep('w_lift',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn btn-primary" id="w-calc-btn" onclick="wCalculate()">Calculate</button>
+      <button class="action-btn btn-secondary" onclick="wResetForm()">Reset</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════ WINDOW ESTIMATES ════════════ -->
+<div id="view-westimate" class="view">
+  <header>
+    <h1>Window Estimates</h1>
+    <p>Tap an estimate to expand it.</p>
+  </header>
+  <div class="form-wrapper">
+    <div id="w-estimate-list"></div>
+    <div class="actions">
+      <button class="action-btn btn-primary" onclick="showView('wcalc',document.getElementById('nav-wcalc'))">New Estimate</button>
+      <button class="action-btn btn-secondary" id="wClearAllBtn" onclick="wClearAllEstimates()">Delete All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ WINDOW SETTINGS ════════════ -->
+<div id="view-wsettings" class="view">
+  <header>
+    <h1>Window Settings</h1>
+    <p>Set the time in seconds each item takes per unit.</p>
+  </header>
+  <div class="form-wrapper">
+
+    <div class="section">
+      <div class="section-title">Setup</div>
+      <div class="items-grid">
+        <div class="item"><label>Setup / Unload</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_setup',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_setup">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_setup',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Interior Windows</div>
+      <div class="items-grid">
+        <div class="item"><label>Interior Small 1x1</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_int_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_int_sm">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_int_sm',1)">+</button></div></div>
+        <div class="item"><label>Interior Medium 2x2</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_int_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_int_md">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_int_md',1)">+</button></div></div>
+        <div class="item"><label>Interior Large 3x3</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_int_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_int_lg">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_int_lg',1)">+</button></div></div>
+        <div class="item"><label>Interior XLarge 4x4+</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_int_xl',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_int_xl">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_int_xl',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Exterior Windows</div>
+      <div class="items-grid">
+        <div class="item"><label>Exterior Small 1x1</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_ext_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_ext_sm">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_ext_sm',1)">+</button></div></div>
+        <div class="item"><label>Exterior Medium 2x2</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_ext_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_ext_md">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_ext_md',1)">+</button></div></div>
+        <div class="item"><label>Exterior Large 3x3</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_ext_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_ext_lg">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_ext_lg',1)">+</button></div></div>
+        <div class="item"><label>Exterior XLarge 4x4+</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_ext_xl',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_ext_xl">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_ext_xl',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Specialty Windows</div>
+      <div class="items-grid">
+        <div class="item"><label>French Pane (per pane)</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_french_pane',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_french_pane">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_french_pane',1)">+</button></div></div>
+        <div class="item"><label>Skylight</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_skylight',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_skylight">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_skylight',1)">+</button></div></div>
+        <div class="item"><label>Transom Window</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_transom',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_transom">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_transom',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Glass Doors</div>
+      <div class="items-grid">
+        <div class="item"><label>Glass Door (Single)</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_glass_door',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_glass_door">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_glass_door',1)">+</button></div></div>
+        <div class="item"><label>Sliding Glass Door</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_sliding_door',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_sliding_door">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_sliding_door',1)">+</button></div></div>
+        <div class="item"><label>Storefront Door</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_storefront_door',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_storefront_door">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_storefront_door',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Screens</div>
+      <div class="items-grid">
+        <div class="item"><label>Screen Small 1x1</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_screen_sm',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_screen_sm">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_screen_sm',1)">+</button></div></div>
+        <div class="item"><label>Screen Medium 2x2</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_screen_md',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_screen_md">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_screen_md',1)">+</button></div></div>
+        <div class="item"><label>Screen Large 3x3</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_screen_lg',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_screen_lg">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_screen_lg',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Tracks &amp; Frames</div>
+      <div class="items-grid">
+        <div class="item"><label>Track Cleaning</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_track',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_track">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_track',1)">+</button></div></div>
+        <div class="item"><label>Frame Wipe</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_frame',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_frame">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_frame',1)">+</button></div></div>
+        <div class="item"><label>Sill Wipe</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_sill',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_sill">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_sill',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Access</div>
+      <div class="items-grid">
+        <div class="item"><label>Step Ladder (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_ladder_step',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_ladder_step">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_ladder_step',1)">+</button></div></div>
+        <div class="item"><label>Extension Ladder (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_ladder_ext',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_ladder_ext">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_ladder_ext',1)">+</button></div></div>
+        <div class="item"><label>Aerial Lift (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_lift',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_lift">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_lift',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn btn-primary" onclick="wSaveSettings()">Save Settings</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════ BACKUP & RESTORE ════════════ -->
+<div id="view-backup" class="view">
+  <header>
+    <h1>Backup &amp; Restore</h1>
+    <p>Save all settings and estimates to a file, or load a previous backup.</p>
+  </header>
+  <div class="form-wrapper">
+
+    <div class="section">
+      <div class="section-title">Download Backup</div>
+      <div style="padding:20px 16px;display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:0.9rem;color:#555;">Saves all janitorial &amp; window settings and every saved estimate to a <code>.json</code> file on your device.</p>
+        <button class="action-btn btn-primary" style="max-width:240px;" onclick="backupData()">&#128190; Download Backup File</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Restore from Backup</div>
+      <div style="padding:20px 16px;display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:0.9rem;color:#555;">Select a backup file to restore. <strong style="color:#b94a48;">This will overwrite all current settings and estimates.</strong></p>
+        <label class="action-btn btn-secondary" style="max-width:240px;cursor:pointer;text-align:center;">
+          &#128194; Choose Backup File
+          <input type="file" accept=".json" style="display:none;" onchange="restoreData(event)">
+        </label>
+        <p id="restore-status" style="font-size:0.88rem;color:#4D6F9C;display:none;"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ═══════════════════════════════════════
+  // JANITORIAL
+  // ═══════════════════════════════════════
+
+  const SECTIONS = [
+    { title: 'Unloading', keys: ['unload1','unload2','unload3'] },
+    { title: 'Toilet Paper', keys: ['tp_nokey','tp_key'] },
+    { title: 'Paper Towels', keys: ['pt_nokey','pt_key'] },
+    { title: 'Hand Soap', keys: ['hs_household_nokey','hs_wall_sm','hs_wall_lg','hs_key'] },
+    { title: 'Toilet Seat Covers', keys: ['tsc_nokey','tsc_key'] },
+    { title: 'Trash', keys: ['trash_sm','trash_md','trash_lg','trash_dumpster'] },
+    { title: 'Dusting', keys: ['dust'] },
+    { title: 'Fixtures & Furniture', keys: ['drinking_fountain','stone_sm','stone_md','stone_lg','table_sm','table_md','table_lg','sinks','microwave'] },
+    { title: 'Toilets', keys: ['toilet1','toilet2','toilet3'] },
+    { title: 'Mirrors', keys: ['mirror_sm','mirror_md','mirror_lg'] },
+    { title: 'Glass Surfaces', keys: ['glass_sm','glass_md','glass_lg'] },
+    { title: 'Floors', keys: ['vacuum','mop'] },
+    { title: 'Fill Mop Bucket', keys: ['bucket_sink','bucket_faucet','bucket_mobile'] },
+    { title: 'Density', keys: ['density1','density2','density3'] },
+  ];
+
+  const LABELS = {
+    unload1:'Unload Level 1', unload2:'Unload Level 2', unload3:'Unload Level 3',
+    tp_nokey:'Toilet Paper (No Key)', tp_key:'Toilet Paper (Key)',
+    pt_nokey:'Paper Towels (No Key)', pt_key:'Paper Towels (Key)',
+    hs_household_nokey:'Hand Soap Household Bottle (No Key)',
+    hs_wall_sm:'Hand Soap Large (Wall Attachment Small)',
+    hs_wall_lg:'Hand Soap Large (Wall Attachment Large)',
+    hs_key:'Hand Soap (Key)',
+    tsc_nokey:'Toilet Seat Covers (No Key)', tsc_key:'Toilet Seat Covers (Key)',
+    trash_sm:'Trash Cans Small', trash_md:'Trash Cans Medium',
+    trash_lg:'Trash Cans Large', trash_dumpster:'Trash to Dumpster',
+    dust:'Dusting',
+    drinking_fountain:'Drinking Fountain',
+    stone_sm:'Stone Tables Small', stone_md:'Stone Tables Medium', stone_lg:'Stone Tables Large',
+    table_sm:'Tables Small', table_md:'Tables Medium', table_lg:'Tables Large',
+    sinks:'Sinks', microwave:'Microwave',
+    toilet1:'Toilets Level 1 (Skirt)', toilet2:'Toilets Level 2 (Regular)',
+    toilet3:'Toilets Level 3 (Extra Seat Flap)',
+    mirror_sm:'Small Mirror (Handheld)', mirror_md:'Medium Mirror (1×1–2×2)',
+    mirror_lg:'Large Mirror (Full Body)',
+    glass_sm:'Small Glass Surface (1×1)', glass_md:'Medium Glass Surface (2×2)',
+    glass_lg:'Large Glass Surface (3×3+)',
+    vacuum:'Vacuuming (per 1000 SqFt)', mop:'Mopable Surfaces (per 1000 SqFt)',
+    bucket_sink:'Fill Mop Bucket: Sink', bucket_faucet:'Fill Mop Bucket: Faucet',
+    bucket_mobile:'Fill Mop Bucket: Mobile',
+    density1:'Density Level 1 (Compact)', density2:'Density Level 2 (Standard)',
+    density3:'Density Level 3 (Wide-Opened)',
+  };
+
+  const ITEM_KEYS = SECTIONS.flatMap(s => s.keys);
+  let timeValues = {};
+  let editingEstimateId = null;
+  const DEFAULTS = { dust: 60, density1: 1.75, density2: 1.0, density3: 0.85 };
+
+  function stepSetting(id, delta) {
+    const el = document.getElementById(id);
+    const val = Math.round(Math.max(0, (parseFloat(el.textContent) || 0) + delta) * 1000) / 1000;
+    el.textContent = val;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function loadSettings() {
+    const saved = JSON.parse(localStorage.getItem('etm_settings') || '{}');
+    ITEM_KEYS.forEach(k => {
+      timeValues[k] = saved[k] ?? (DEFAULTS[k] ?? 0);
+      const el = document.getElementById('s_' + k);
+      if (el) el.textContent = timeValues[k];
+    });
+  }
+
+  function saveSettings() {
+    ITEM_KEYS.forEach(k => {
+      const el = document.getElementById('s_' + k);
+      const raw = el ? parseFloat(el.textContent) || 0 : 0;
+      timeValues[k] = raw;
+      if (el) el.textContent = raw;
+    });
+    localStorage.setItem('etm_settings', JSON.stringify(timeValues));
+    recalcAllEstimates();
+    showToast();
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 2000);
+  }
+
+  function step(id, delta) {
+    const el = document.getElementById(id);
+    el.textContent = Math.max(0, (parseInt(el.textContent) || 0) + delta);
+  }
+
+  function fmtTime(sec) {
+    sec = Math.ceil(sec * 10) / 10;
+    if (sec === 0) return '0s';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = Math.round((sec % 60) * 10) / 10;
+    let out = '';
+    if (h > 0) out += h + 'h ';
+    if (m > 0 || h > 0) out += m + 'm ';
+    if (s > 0 || out === '') out += s + 's';
+    return out.trim();
+  }
+
+  function loadEstimates() {
+    try { return JSON.parse(localStorage.getItem('etm_estimates') || '[]'); }
+    catch { return []; }
+  }
+
+  function saveEstimates(list) {
+    localStorage.setItem('etm_estimates', JSON.stringify(list));
+  }
+
+  function renderEstimateList() {
+    const list = loadEstimates();
+    const container = document.getElementById('estimate-list');
+    const clearBtn = document.getElementById('clearAllBtn');
+    if (list.length === 0) {
+      container.innerHTML = '<div class="est-empty">No estimates yet. Use the Calculator to create one.</div>';
+      clearBtn.style.display = 'none';
+      return;
+    }
+    clearBtn.style.display = '';
+    container.innerHTML = list.map(est => {
+      const sectionsHtml = est.sections.map(sec => `
+        <div class="est-section">
+          <div class="est-section-title">${sec.title}</div>
+          <div class="est-header-row">
+            <span style="flex:1">Item</span>
+            <span style="width:50px;text-align:center">Qty</span>
+            <span style="width:60px;text-align:right">Rate</span>
+            <span style="width:70px;text-align:right">Time</span>
+          </div>
+          ${sec.rows.map(r => `
+            <div class="est-row">
+              <span class="est-name">${r.name}${r.mopPct != null ? ` <span style="color:#999999;font-size:0.78rem;">(${r.mopPct}% moppable)</span>` : ''}${r.densityMult != null && r.densityMult !== 1 ? ` <span style="color:#7DA1D4;font-size:0.78rem;">×${Math.round(r.densityMult*100)/100} density</span>` : ''}</span>
+              <span class="est-qty">${r.sqftBased ? Number(r.qty).toLocaleString()+' sqft' : r.qty}</span>
+              <span class="est-rate">${r.rate}s${r.sqftBased ? ' /1k sqft' : ' ea'}</span>
+              <span class="est-time">${fmtTime(r.sub)}</span>
+            </div>`).join('')}
+        </div>`).join('');
+      const bizLine = est.bizName
+        ? `<div style="font-weight:700;color:#000000;font-size:0.9rem;">${est.bizName}</div>`
+          + (est.bizAddress ? `<div style="font-size:0.8rem;color:#4D6F9C;">${est.bizAddress}</div>` : '')
+          + (est.bizSqft ? `<div style="font-size:0.8rem;color:#999999;">${Number(est.bizSqft).toLocaleString()} sq ft</div>` : '')
+        : '';
+      return `<div class="est-card" id="est-card-${est.id}">
+        <div class="est-card-header" onclick="toggleCard(${est.id})">
+          <div class="est-card-meta">
+            ${bizLine}
+            <div class="ts">${est.timestamp}</div>
+            <div class="total-pill">${fmtTime(est.totalSec)}</div>
+          </div>
+          ${est.inputs ? `<button class="edit-btn" onclick="event.stopPropagation();editEstimate(${est.id})" title="Edit">✎</button>` : ''}
+          <button class="del-btn" onclick="event.stopPropagation();deleteEstimate(${est.id})" title="Delete">✕</button>
+          <span class="est-card-toggle">▾</span>
+        </div>
+        <div class="est-card-body">
+          ${sectionsHtml}
+          <div class="est-total-box" style="border-radius:0 0 10px 10px;margin:0">
+            <div class="lbl">Total Estimated Time</div>
+            <div class="val">${fmtTime(est.totalSec)}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleCard(id) {
+    const card = document.getElementById('est-card-' + id);
+    if (card) card.classList.toggle('open');
+  }
+
+  function deleteEstimate(id) {
+    saveEstimates(loadEstimates().filter(e => e.id !== id));
+    renderEstimateList();
+  }
+
+  function clearAllEstimates() {
+    if (!confirm('Delete all janitorial estimates?')) return;
+    saveEstimates([]);
+    renderEstimateList();
+  }
+
+  function computeSections(snapshot, sqftVal, mopPct) {
+    const vacMultiplier = sqftVal / 1000;
+    const mopMultiplier = (sqftVal * (mopPct / 100)) / 1000;
+    const d1 = snapshot['density1'] || 0;
+    const d2 = snapshot['density2'] || 0;
+    const d3 = snapshot['density3'] || 0;
+    const dTotal = d1 + d2 + d3;
+    const densityMult = dTotal > 0
+      ? (d1*(timeValues['density1']??1.75) + d2*(timeValues['density2']??1.0) + d3*(timeValues['density3']??0.85)) / dTotal
+      : 1.0;
+    let totalSec = 0;
+    const sections = [];
+    SECTIONS.forEach(sec => {
+      const rows = sec.keys
+        .filter(k => {
+          if (k === 'vacuum') return sqftVal > 0 && (timeValues[k]||0) > 0;
+          if (k === 'mop') return sqftVal > 0 && mopPct > 0 && (timeValues[k]||0) > 0;
+          if (k === 'dust') return sqftVal > 0 && (timeValues[k]||0) > 0;
+          return snapshot[k] > 0;
+        })
+        .map(k => {
+          if (k === 'dust') {
+            const rate = timeValues[k]||0;
+            const sub = (sqftVal/1000)*rate;
+            totalSec += sub;
+            return { name:LABELS[k], qty:sqftVal, rate, sub, sqftBased:true };
+          }
+          if (k === 'vacuum') {
+            const rate = timeValues[k]||0;
+            const sub = vacMultiplier*rate*densityMult;
+            totalSec += sub;
+            return { name:LABELS[k], qty:sqftVal, rate, sub, sqftBased:true, densityMult };
+          }
+          if (k === 'mop') {
+            const mopSqft = sqftVal*(mopPct/100);
+            const rate = timeValues[k]||0;
+            const sub = mopMultiplier*rate*densityMult;
+            totalSec += sub;
+            return { name:LABELS[k], qty:mopSqft, rate, sub, sqftBased:true, mopPct, densityMult };
+          }
+          const qty = snapshot[k];
+          const rate = timeValues[k]||0;
+          const sub = qty*rate;
+          totalSec += sub;
+          return { name:LABELS[k], qty, rate, sub };
+        });
+      if (rows.length > 0) sections.push({ title:sec.title, rows });
+    });
+    return { sections, totalSec };
+  }
+
+  function calculate() {
+    const snapshot = {};
+    ITEM_KEYS.forEach(k => {
+      const el = document.getElementById(k);
+      snapshot[k] = el ? (parseInt(el.textContent)||0) : 0;
+    });
+    const bizName = document.getElementById('biz-name').value.trim();
+    const bizAddress = document.getElementById('biz-address').value.trim();
+    const bizSqft = document.getElementById('biz-sqft').value.trim();
+    const sqftVal = parseFloat(bizSqft)||0;
+    const mopPct = Math.min(100, Math.max(0, parseFloat(document.getElementById('mop-pct').value)||0));
+    const inputs = { ...snapshot, sqft:sqftVal, mopPct };
+    const { sections, totalSec } = computeSections(snapshot, sqftVal, mopPct);
+    const list = loadEstimates();
+    let openId;
+    if (editingEstimateId !== null) {
+      const idx = list.findIndex(e => e.id === editingEstimateId);
+      if (idx !== -1) list[idx] = { ...list[idx], bizName, bizAddress, bizSqft, totalSec, sections, inputs };
+      openId = editingEstimateId;
+      editingEstimateId = null;
+      document.getElementById('calc-btn').textContent = 'Calculate';
+    } else {
+      const est = { id:Date.now(), timestamp:new Date().toLocaleString(), bizName, bizAddress, bizSqft, totalSec, sections, inputs };
+      list.unshift(est);
+      openId = est.id;
+    }
+    saveEstimates(list);
+    resetForm();
+    renderEstimateList();
+    showView('estimate', document.getElementById('nav-estimate'));
+    setTimeout(() => toggleCard(openId), 50);
+  }
+
+  function editEstimate(id) {
+    const est = loadEstimates().find(e => e.id === id);
+    if (!est || !est.inputs) return;
+    const inp = est.inputs;
+    ITEM_KEYS.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.textContent = inp[k] ?? 0;
+    });
+    document.getElementById('biz-name').value = est.bizName||'';
+    document.getElementById('biz-address').value = est.bizAddress||'';
+    document.getElementById('biz-sqft').value = est.bizSqft||'';
+    document.getElementById('mop-pct').value = inp.mopPct ?? 100;
+    editingEstimateId = id;
+    document.getElementById('calc-btn').textContent = 'Update Estimate';
+    showView('calc', document.getElementById('nav-calc'));
+    window.scrollTo(0, 0);
+  }
+
+  function recalcAllEstimates() {
+    const list = loadEstimates().map(est => {
+      if (!est.inputs) return est;
+      const { sqft, mopPct, ...snapshot } = est.inputs;
+      const { sections, totalSec } = computeSections(snapshot, sqft||0, mopPct??100);
+      return { ...est, sections, totalSec };
+    });
+    saveEstimates(list);
+    renderEstimateList();
+  }
+
+  function resetForm() {
+    ITEM_KEYS.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.textContent = '0';
+    });
+    document.getElementById('biz-name').value = '';
+    document.getElementById('biz-address').value = '';
+    document.getElementById('biz-sqft').value = '';
+    document.getElementById('mop-pct').value = '100';
+  }
+
+  // ═══════════════════════════════════════
+  // WINDOW
+  // ═══════════════════════════════════════
+
+  const W_SECTIONS = [
+    { title: 'Setup', keys: ['w_setup'] },
+    { title: 'Interior Windows', keys: ['w_int_sm','w_int_md','w_int_lg','w_int_xl'] },
+    { title: 'Exterior Windows', keys: ['w_ext_sm','w_ext_md','w_ext_lg','w_ext_xl'] },
+    { title: 'Specialty Windows', keys: ['w_french_pane','w_skylight','w_transom'] },
+    { title: 'Glass Doors', keys: ['w_glass_door','w_sliding_door','w_storefront_door'] },
+    { title: 'Screens', keys: ['w_screen_sm','w_screen_md','w_screen_lg'] },
+    { title: 'Tracks & Frames', keys: ['w_track','w_frame','w_sill'] },
+    { title: 'Access', keys: ['w_ladder_step','w_ladder_ext','w_lift'] },
+  ];
+
+  const W_LABELS = {
+    w_setup: 'Setup / Unload',
+    w_int_sm: 'Interior Small 1x1', w_int_md: 'Interior Medium 2x2',
+    w_int_lg: 'Interior Large 3x3', w_int_xl: 'Interior XLarge 4x4+',
+    w_ext_sm: 'Exterior Small 1x1', w_ext_md: 'Exterior Medium 2x2',
+    w_ext_lg: 'Exterior Large 3x3', w_ext_xl: 'Exterior XLarge 4x4+',
+    w_french_pane: 'French Pane (per pane)', w_skylight: 'Skylight', w_transom: 'Transom Window',
+    w_glass_door: 'Glass Door (Single)', w_sliding_door: 'Sliding Glass Door', w_storefront_door: 'Storefront Door',
+    w_screen_sm: 'Screen Small 1x1', w_screen_md: 'Screen Medium 2x2', w_screen_lg: 'Screen Large 3x3',
+    w_track: 'Track Cleaning', w_frame: 'Frame Wipe', w_sill: 'Sill Wipe',
+    w_ladder_step: 'Step Ladder (per setup)', w_ladder_ext: 'Extension Ladder (per setup)', w_lift: 'Aerial Lift (per setup)',
+  };
+
+  const W_ITEM_KEYS = W_SECTIONS.flatMap(s => s.keys);
+  let wTimeValues = {};
+  let wEditingEstimateId = null;
+
+  function wStepSetting(id, delta) {
+    const el = document.getElementById(id);
+    const val = Math.round(Math.max(0, (parseFloat(el.textContent)||0) + delta) * 1000) / 1000;
+    el.textContent = val;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function wLoadSettings() {
+    const saved = JSON.parse(localStorage.getItem('etm_w_settings') || '{}');
+    W_ITEM_KEYS.forEach(k => {
+      wTimeValues[k] = saved[k] ?? 0;
+      const el = document.getElementById('ws_' + k);
+      if (el) el.textContent = wTimeValues[k];
+    });
+  }
+
+  function wSaveSettings() {
+    W_ITEM_KEYS.forEach(k => {
+      const el = document.getElementById('ws_' + k);
+      const raw = el ? parseFloat(el.textContent)||0 : 0;
+      wTimeValues[k] = raw;
+      if (el) el.textContent = raw;
+    });
+    localStorage.setItem('etm_w_settings', JSON.stringify(wTimeValues));
+    wRecalcAllEstimates();
+    showToast();
+  }
+
+  function wStep(id, delta) {
+    const el = document.getElementById(id);
+    el.textContent = Math.max(0, (parseInt(el.textContent)||0) + delta);
+  }
+
+  function wLoadEstimates() {
+    try { return JSON.parse(localStorage.getItem('etm_w_estimates') || '[]'); }
+    catch { return []; }
+  }
+
+  function wSaveEstimates(list) {
+    localStorage.setItem('etm_w_estimates', JSON.stringify(list));
+  }
+
+  function wRenderEstimateList() {
+    const list = wLoadEstimates();
+    const container = document.getElementById('w-estimate-list');
+    const clearBtn = document.getElementById('wClearAllBtn');
+    if (list.length === 0) {
+      container.innerHTML = '<div class="est-empty">No estimates yet. Use the Window Calculator to create one.</div>';
+      clearBtn.style.display = 'none';
+      return;
+    }
+    clearBtn.style.display = '';
+    container.innerHTML = list.map(est => {
+      const sectionsHtml = est.sections.map(sec => `
+        <div class="est-section">
+          <div class="est-section-title">${sec.title}</div>
+          <div class="est-header-row">
+            <span style="flex:1">Item</span>
+            <span style="width:50px;text-align:center">Qty</span>
+            <span style="width:60px;text-align:right">Rate</span>
+            <span style="width:70px;text-align:right">Time</span>
+          </div>
+          ${sec.rows.map(r => `
+            <div class="est-row">
+              <span class="est-name">${r.name}</span>
+              <span class="est-qty">${r.qty}</span>
+              <span class="est-rate">${r.rate}s ea</span>
+              <span class="est-time">${fmtTime(r.sub)}</span>
+            </div>`).join('')}
+        </div>`).join('');
+      const bizLine = est.bizName
+        ? `<div style="font-weight:700;color:#000000;font-size:0.9rem;">${est.bizName}</div>`
+          + (est.bizAddress ? `<div style="font-size:0.8rem;color:#4D6F9C;">${est.bizAddress}</div>` : '')
+        : '';
+      return `<div class="est-card" id="w-est-card-${est.id}">
+        <div class="est-card-header" onclick="wToggleCard(${est.id})">
+          <div class="est-card-meta">
+            ${bizLine}
+            <div class="ts">${est.timestamp}</div>
+            <div class="total-pill">${fmtTime(est.totalSec)}</div>
+          </div>
+          ${est.inputs ? `<button class="edit-btn" onclick="event.stopPropagation();wEditEstimate(${est.id})" title="Edit">✎</button>` : ''}
+          <button class="del-btn" onclick="event.stopPropagation();wDeleteEstimate(${est.id})" title="Delete">✕</button>
+          <span class="est-card-toggle">▾</span>
+        </div>
+        <div class="est-card-body">
+          ${sectionsHtml}
+          <div class="est-total-box" style="border-radius:0 0 10px 10px;margin:0">
+            <div class="lbl">Total Estimated Time</div>
+            <div class="val">${fmtTime(est.totalSec)}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function wToggleCard(id) {
+    const card = document.getElementById('w-est-card-' + id);
+    if (card) card.classList.toggle('open');
+  }
+
+  function wDeleteEstimate(id) {
+    wSaveEstimates(wLoadEstimates().filter(e => e.id !== id));
+    wRenderEstimateList();
+  }
+
+  function wClearAllEstimates() {
+    if (!confirm('Delete all window estimates?')) return;
+    wSaveEstimates([]);
+    wRenderEstimateList();
+  }
+
+  function wComputeSections(snapshot) {
+    let totalSec = 0;
+    const sections = [];
+    W_SECTIONS.forEach(sec => {
+      const rows = sec.keys
+        .filter(k => snapshot[k] > 0)
+        .map(k => {
+          const qty = snapshot[k];
+          const rate = wTimeValues[k]||0;
+          const sub = qty*rate;
+          totalSec += sub;
+          return { name:W_LABELS[k], qty, rate, sub };
+        });
+      if (rows.length > 0) sections.push({ title:sec.title, rows });
+    });
+    return { sections, totalSec };
+  }
+
+  function wCalculate() {
+    const snapshot = {};
+    W_ITEM_KEYS.forEach(k => {
+      const el = document.getElementById(k);
+      snapshot[k] = el ? (parseInt(el.textContent)||0) : 0;
+    });
+    const bizName = document.getElementById('w-biz-name').value.trim();
+    const bizAddress = document.getElementById('w-biz-address').value.trim();
+    const inputs = { ...snapshot };
+    const { sections, totalSec } = wComputeSections(snapshot);
+    const list = wLoadEstimates();
+    let openId;
+    if (wEditingEstimateId !== null) {
+      const idx = list.findIndex(e => e.id === wEditingEstimateId);
+      if (idx !== -1) list[idx] = { ...list[idx], bizName, bizAddress, totalSec, sections, inputs };
+      openId = wEditingEstimateId;
+      wEditingEstimateId = null;
+      document.getElementById('w-calc-btn').textContent = 'Calculate';
+    } else {
+      const est = { id:Date.now(), timestamp:new Date().toLocaleString(), bizName, bizAddress, totalSec, sections, inputs };
+      list.unshift(est);
+      openId = est.id;
+    }
+    wSaveEstimates(list);
+    wResetForm();
+    wRenderEstimateList();
+    showView('westimate', document.getElementById('nav-westimate'));
+    setTimeout(() => wToggleCard(openId), 50);
+  }
+
+  function wEditEstimate(id) {
+    const est = wLoadEstimates().find(e => e.id === id);
+    if (!est || !est.inputs) return;
+    W_ITEM_KEYS.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.textContent = est.inputs[k] ?? 0;
+    });
+    document.getElementById('w-biz-name').value = est.bizName||'';
+    document.getElementById('w-biz-address').value = est.bizAddress||'';
+    wEditingEstimateId = id;
+    document.getElementById('w-calc-btn').textContent = 'Update Estimate';
+    showView('wcalc', document.getElementById('nav-wcalc'));
+    window.scrollTo(0, 0);
+  }
+
+  function wRecalcAllEstimates() {
+    const list = wLoadEstimates().map(est => {
+      if (!est.inputs) return est;
+      const { sections, totalSec } = wComputeSections(est.inputs);
+      return { ...est, sections, totalSec };
+    });
+    wSaveEstimates(list);
+    wRenderEstimateList();
+  }
+
+  function wResetForm() {
+    W_ITEM_KEYS.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.textContent = '0';
+    });
+    document.getElementById('w-biz-name').value = '';
+    document.getElementById('w-biz-address').value = '';
+  }
+
+  // ═══════════════════════════════════════
+  // SHARED
+  // ═══════════════════════════════════════
+
+  document.addEventListener('keydown', function(e) {
+    if (!e.target.classList.contains('editable')) return;
+    if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); return; }
+    const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+    if (e.key === '.' && !e.target.textContent.includes('.')) return;
+    if (!allowed.includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+  });
+
+  function showView(name, btn) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'estimate') renderEstimateList();
+    if (name === 'westimate') wRenderEstimateList();
+    if (name === 'backup') { const s = document.getElementById('restore-status'); if (s) s.style.display = 'none'; }
+    window.scrollTo(0, 0);
+  }
+
+  loadSettings();
+  wLoadSettings();
+
+  // ═══════════════════════════════════════
+  // BACKUP & RESTORE
+  // ═══════════════════════════════════════
+
+  function backupData() {
+    const data = {
+      version: 1,
+      date: new Date().toISOString(),
+      etm_settings:   JSON.parse(localStorage.getItem('etm_settings')   || 'null'),
+      etm_estimates:  JSON.parse(localStorage.getItem('etm_estimates')  || '[]'),
+      etm_w_settings: JSON.parse(localStorage.getItem('etm_w_settings') || 'null'),
+      etm_w_estimates:JSON.parse(localStorage.getItem('etm_w_estimates')|| '[]'),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href     = url;
+    a.download = 'etm-backup-' + date + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    const t = document.getElementById('toast');
+    t.textContent = 'Backup downloaded!';
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; t.textContent = 'Settings saved!'; }, 2500);
+  }
+
+  function restoreData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (typeof data !== 'object' || data === null) throw new Error('Invalid file format.');
+        if (data.version !== 1) throw new Error('Unrecognised backup version.');
+        if (data.etm_settings)    localStorage.setItem('etm_settings',    JSON.stringify(data.etm_settings));
+        if (data.etm_estimates)   localStorage.setItem('etm_estimates',   JSON.stringify(data.etm_estimates));
+        if (data.etm_w_settings)  localStorage.setItem('etm_w_settings',  JSON.stringify(data.etm_w_settings));
+        if (data.etm_w_estimates) localStorage.setItem('etm_w_estimates', JSON.stringify(data.etm_w_estimates));
+        loadSettings();
+        wLoadSettings();
+        const status = document.getElementById('restore-status');
+        status.textContent = '✔ Backup restored successfully from ' + file.name;
+        status.style.display = 'block';
+        status.style.color = '#2e7d32';
+        const t = document.getElementById('toast');
+        t.textContent = 'Backup restored!';
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; t.textContent = 'Settings saved!'; }, 2500);
+      } catch (err) {
+        const status = document.getElementById('restore-status');
+        status.textContent = '✖ Restore failed: ' + err.message;
+        status.style.display = 'block';
+        status.style.color = '#b94a48';
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+</script>
+
+</body>
+</html>
