@@ -364,6 +364,29 @@
       margin-top: 3px;
     }
 
+    .price-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+
+    .price-pill {
+      font-size: 0.78rem;
+      color: #4D6F9C;
+      font-weight: 600;
+    }
+
+    .price-pill .price-pill-label {
+      color: #999999;
+      font-weight: 400;
+    }
+
+    .price-pill-sep {
+      color: #cccccc;
+      font-size: 0.78rem;
+    }
+
     .est-card-toggle { font-size: 1.2rem; color: #999999; transition: transform 0.2s; }
     .est-card.open .est-card-toggle { transform: rotate(180deg); }
     .est-card-body { display: none; border-top: 1px solid #9DBEED; }
@@ -400,6 +423,38 @@
     }
 
     .edit-btn:hover { background: #e8f0fb; border-color: #4D6F9C; }
+
+    /* ── Pricing tiers ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-top: 2px solid #4D6F9C;
+    }
+
+    .pricing-tier {
+      padding: 14px 10px;
+      text-align: center;
+      border-right: 1px solid #9DBEED;
+    }
+
+    .pricing-tier:last-child { border-right: none; }
+
+    .pricing-tier-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999999;
+      margin-bottom: 5px;
+    }
+
+    .pricing-tier-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #4D6F9C;
+    }
+
+    .pricing-tier.tier-ideal .pricing-tier-value { color: #2e7d32; }
 
     /* ── Mobile ── */
     @media (max-width: 620px) {
@@ -685,6 +740,27 @@
   <div class="form-wrapper">
 
     <div class="section">
+      <div class="section-title">Pricing Rates ($/hr)</div>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+        <p style="font-size:0.8rem;color:#999999;">These hourly rates are used to calculate BANTA, Standard, and Ideal prices on all estimates.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.78rem;color:#999999;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">BANTA</label>
+            <input type="number" id="price-banta" value="50" min="0" step="0.01" class="biz-input" style="text-align:center;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.78rem;color:#999999;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Standard</label>
+            <input type="number" id="price-standard" value="60" min="0" step="0.01" class="biz-input" style="text-align:center;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.78rem;color:#999999;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Ideal</label>
+            <input type="number" id="price-ideal" value="70" min="0" step="0.01" class="biz-input" style="text-align:center;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
       <div class="section-title">Unloading</div>
       <div class="items-grid">
         <div class="item"><label>Unload Level 1</label><div class="stepper"><button class="step-btn minus" onclick="stepSetting('s_unload1',-1)">−</button><div class="qty-display editable" contenteditable="true" id="s_unload1">0</div><button class="step-btn plus" onclick="stepSetting('s_unload1',1)">+</button></div></div>
@@ -942,6 +1018,27 @@
   <div class="form-wrapper">
 
     <div class="section">
+      <div class="section-title">Pricing Rates ($/hr)</div>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+        <p style="font-size:0.8rem;color:#999999;">These hourly rates are used to calculate BANTA, Standard, and Ideal prices on all estimates.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.78rem;color:#999999;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">BANTA</label>
+            <input type="number" id="price-banta-w" value="50" min="0" step="0.01" class="biz-input" style="text-align:center;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.78rem;color:#999999;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Standard</label>
+            <input type="number" id="price-standard-w" value="60" min="0" step="0.01" class="biz-input" style="text-align:center;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.78rem;color:#999999;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Ideal</label>
+            <input type="number" id="price-ideal-w" value="70" min="0" step="0.01" class="biz-input" style="text-align:center;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
       <div class="section-title">Setup</div>
       <div class="items-grid">
         <div class="item"><label>Setup / Unload</label><div class="stepper"><button class="step-btn minus" onclick="wStepSetting('ws_w_setup',-1)">−</button><div class="qty-display editable" contenteditable="true" id="ws_w_setup">0</div><button class="step-btn plus" onclick="wStepSetting('ws_w_setup',1)">+</button></div></div>
@@ -1107,6 +1204,31 @@
   let editingEstimateId = null;
   const DEFAULTS = { dust: 60, density1: 1.75, density2: 1.0, density3: 0.85 };
 
+  let priceRates = { banta: 50, standard: 60, ideal: 70 };
+
+  function loadPriceRates() {
+    const saved = JSON.parse(localStorage.getItem('etm_price_rates') || 'null');
+    if (saved) priceRates = saved;
+    ['', '-w'].forEach(sfx => {
+      document.getElementById('price-banta'    + sfx).value = priceRates.banta;
+      document.getElementById('price-standard' + sfx).value = priceRates.standard;
+      document.getElementById('price-ideal'    + sfx).value = priceRates.ideal;
+    });
+  }
+
+  function savePriceRates(sfx) {
+    sfx = sfx || '';
+    priceRates.banta    = parseFloat(document.getElementById('price-banta'    + sfx).value) || 0;
+    priceRates.standard = parseFloat(document.getElementById('price-standard' + sfx).value) || 0;
+    priceRates.ideal    = parseFloat(document.getElementById('price-ideal'    + sfx).value) || 0;
+    localStorage.setItem('etm_price_rates', JSON.stringify(priceRates));
+    ['', '-w'].forEach(s => {
+      document.getElementById('price-banta'    + s).value = priceRates.banta;
+      document.getElementById('price-standard' + s).value = priceRates.standard;
+      document.getElementById('price-ideal'    + s).value = priceRates.ideal;
+    });
+  }
+
   function stepSetting(id, delta) {
     const el = document.getElementById(id);
     const val = Math.round(Math.max(0, (parseFloat(el.textContent) || 0) + delta) * 1000) / 1000;
@@ -1136,6 +1258,7 @@
       if (el) el.textContent = raw;
     });
     localStorage.setItem('etm_settings', JSON.stringify(timeValues));
+    savePriceRates();
     recalcAllEstimates();
     showToast();
   }
@@ -1149,6 +1272,15 @@
   function step(id, delta) {
     const el = document.getElementById(id);
     el.textContent = Math.max(0, (parseInt(el.textContent) || 0) + delta);
+  }
+
+  function fmtPrices(totalSec) {
+    const hrs = totalSec / 3600;
+    return {
+      banta:    '$' + (hrs * priceRates.banta).toFixed(2),
+      standard: '$' + (hrs * priceRates.standard).toFixed(2),
+      ideal:    '$' + (hrs * priceRates.ideal).toFixed(2),
+    };
   }
 
   function fmtTime(sec) {
@@ -1206,12 +1338,20 @@
           + (est.bizAddress ? `<div style="font-size:0.8rem;color:#4D6F9C;">${est.bizAddress}</div>` : '')
           + (est.bizSqft ? `<div style="font-size:0.8rem;color:#999999;">${Number(est.bizSqft).toLocaleString()} sq ft</div>` : '')
         : '';
+      const p = fmtPrices(est.totalSec);
       return `<div class="est-card" id="est-card-${est.id}">
         <div class="est-card-header" onclick="toggleCard(${est.id})">
           <div class="est-card-meta">
             ${bizLine}
             <div class="ts">${est.timestamp}</div>
             <div class="total-pill">${fmtTime(est.totalSec)}</div>
+            <div class="price-pills">
+              <span class="price-pill"><span class="price-pill-label">BANTA </span>${p.banta}</span>
+              <span class="price-pill-sep">|</span>
+              <span class="price-pill"><span class="price-pill-label">Standard </span>${p.standard}</span>
+              <span class="price-pill-sep">|</span>
+              <span class="price-pill"><span class="price-pill-label">Ideal </span>${p.ideal}</span>
+            </div>
           </div>
           ${est.inputs ? `<button class="edit-btn" onclick="event.stopPropagation();editEstimate(${est.id})" title="Edit">✎</button>` : ''}
           <button class="del-btn" onclick="event.stopPropagation();deleteEstimate(${est.id})" title="Delete">✕</button>
@@ -1219,9 +1359,23 @@
         </div>
         <div class="est-card-body">
           ${sectionsHtml}
-          <div class="est-total-box" style="border-radius:0 0 10px 10px;margin:0">
+          <div class="est-total-box" style="border-radius:0;margin:0">
             <div class="lbl">Total Estimated Time</div>
             <div class="val">${fmtTime(est.totalSec)}</div>
+          </div>
+          <div class="pricing-grid" style="border-radius:0 0 10px 10px;overflow:hidden">
+            <div class="pricing-tier">
+              <div class="pricing-tier-name">BANTA</div>
+              <div class="pricing-tier-value">${p.banta}</div>
+            </div>
+            <div class="pricing-tier">
+              <div class="pricing-tier-name">Standard</div>
+              <div class="pricing-tier-value">${p.standard}</div>
+            </div>
+            <div class="pricing-tier tier-ideal">
+              <div class="pricing-tier-name">Ideal</div>
+              <div class="pricing-tier-value">${p.ideal}</div>
+            </div>
           </div>
         </div>
       </div>`;
@@ -1429,6 +1583,7 @@
       if (el) el.textContent = raw;
     });
     localStorage.setItem('etm_w_settings', JSON.stringify(wTimeValues));
+    savePriceRates('-w');
     wRecalcAllEstimates();
     showToast();
   }
@@ -1479,12 +1634,20 @@
         ? `<div style="font-weight:700;color:#000000;font-size:0.9rem;">${est.bizName}</div>`
           + (est.bizAddress ? `<div style="font-size:0.8rem;color:#4D6F9C;">${est.bizAddress}</div>` : '')
         : '';
+      const p = fmtPrices(est.totalSec);
       return `<div class="est-card" id="w-est-card-${est.id}">
         <div class="est-card-header" onclick="wToggleCard(${est.id})">
           <div class="est-card-meta">
             ${bizLine}
             <div class="ts">${est.timestamp}</div>
             <div class="total-pill">${fmtTime(est.totalSec)}</div>
+            <div class="price-pills">
+              <span class="price-pill"><span class="price-pill-label">BANTA </span>${p.banta}</span>
+              <span class="price-pill-sep">|</span>
+              <span class="price-pill"><span class="price-pill-label">Standard </span>${p.standard}</span>
+              <span class="price-pill-sep">|</span>
+              <span class="price-pill"><span class="price-pill-label">Ideal </span>${p.ideal}</span>
+            </div>
           </div>
           ${est.inputs ? `<button class="edit-btn" onclick="event.stopPropagation();wEditEstimate(${est.id})" title="Edit">✎</button>` : ''}
           <button class="del-btn" onclick="event.stopPropagation();wDeleteEstimate(${est.id})" title="Delete">✕</button>
@@ -1492,9 +1655,23 @@
         </div>
         <div class="est-card-body">
           ${sectionsHtml}
-          <div class="est-total-box" style="border-radius:0 0 10px 10px;margin:0">
+          <div class="est-total-box" style="border-radius:0;margin:0">
             <div class="lbl">Total Estimated Time</div>
             <div class="val">${fmtTime(est.totalSec)}</div>
+          </div>
+          <div class="pricing-grid" style="border-radius:0 0 10px 10px;overflow:hidden">
+            <div class="pricing-tier">
+              <div class="pricing-tier-name">BANTA</div>
+              <div class="pricing-tier-value">${p.banta}</div>
+            </div>
+            <div class="pricing-tier">
+              <div class="pricing-tier-name">Standard</div>
+              <div class="pricing-tier-value">${p.standard}</div>
+            </div>
+            <div class="pricing-tier tier-ideal">
+              <div class="pricing-tier-name">Ideal</div>
+              <div class="pricing-tier-value">${p.ideal}</div>
+            </div>
           </div>
         </div>
       </div>`;
@@ -1623,6 +1800,7 @@
   }
 
   loadSettings();
+  loadPriceRates();
   wLoadSettings();
 
   // ═══════════════════════════════════════
@@ -1633,10 +1811,11 @@
     const data = {
       version: 1,
       date: new Date().toISOString(),
-      etm_settings:   JSON.parse(localStorage.getItem('etm_settings')   || 'null'),
-      etm_estimates:  JSON.parse(localStorage.getItem('etm_estimates')  || '[]'),
-      etm_w_settings: JSON.parse(localStorage.getItem('etm_w_settings') || 'null'),
-      etm_w_estimates:JSON.parse(localStorage.getItem('etm_w_estimates')|| '[]'),
+      etm_settings:    JSON.parse(localStorage.getItem('etm_settings')    || 'null'),
+      etm_estimates:   JSON.parse(localStorage.getItem('etm_estimates')   || '[]'),
+      etm_w_settings:  JSON.parse(localStorage.getItem('etm_w_settings')  || 'null'),
+      etm_w_estimates: JSON.parse(localStorage.getItem('etm_w_estimates') || '[]'),
+      etm_price_rates: JSON.parse(localStorage.getItem('etm_price_rates') || 'null'),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
@@ -1665,7 +1844,9 @@
         if (data.etm_estimates)   localStorage.setItem('etm_estimates',   JSON.stringify(data.etm_estimates));
         if (data.etm_w_settings)  localStorage.setItem('etm_w_settings',  JSON.stringify(data.etm_w_settings));
         if (data.etm_w_estimates) localStorage.setItem('etm_w_estimates', JSON.stringify(data.etm_w_estimates));
+        if (data.etm_price_rates) localStorage.setItem('etm_price_rates', JSON.stringify(data.etm_price_rates));
         loadSettings();
+        loadPriceRates();
         wLoadSettings();
         const status = document.getElementById('restore-status');
         status.textContent = '✔ Backup restored successfully from ' + file.name;
