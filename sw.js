@@ -1,4 +1,4 @@
-const CACHE = 'etm-v1';
+const CACHE = 'etm-v2';
 const ASSETS = [
   '/ETMCleaning-Calculator/',
   '/ETMCleaning-Calculator/index.html',
