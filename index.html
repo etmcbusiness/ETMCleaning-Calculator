@@ -531,6 +531,49 @@
       z-index: 100;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
+
+    /* ── Submit modal ── */
+    #submit-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #submit-modal-box {
+      background: #FFFFFF;
+      border-radius: 14px;
+      padding: 28px 24px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    }
+
+    #submit-modal-box h3 {
+      color: #4D6F9C;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    #submit-modal-box p {
+      color: #555555;
+      font-size: 0.9rem;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    #submit-modal-box .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-success { background: #2e7d32; color: #FFFFFF; }
+    .btn-success:hover { background: #43a047; }
   </style>
 </head>
 <body>
@@ -557,6 +600,19 @@
 
 <div id="toast">Settings saved!</div>
 
+<!-- Submit / combine modal -->
+<div id="submit-modal">
+  <div id="submit-modal-box">
+    <h3>Estimate saved!</h3>
+    <p>Would you like to add the other service to this estimate before submitting?</p>
+    <div class="modal-actions">
+      <button id="submit-modal-add-btn" class="action-btn btn-primary" onclick="submitModalAddOther()">Add Window Cleaning</button>
+      <button class="action-btn btn-success" onclick="submitModalSendNow()">Submit Now</button>
+      <button class="action-btn btn-secondary" onclick="submitModalDismiss()">Not Now</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════ JANITORIAL CALCULATOR ════════════ -->
 <div id="view-calc" class="view active">
   <div class="form-wrapper">
@@ -575,6 +631,14 @@
         <div style="display:flex;flex-direction:column;gap:4px;">
           <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Square Footage</label>
           <input type="number" id="biz-sqft" placeholder="e.g. 4500" min="0" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Contact Name</label>
+          <input type="text" id="contact-name" placeholder="e.g. Jane Smith" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Contact Email</label>
+          <input type="email" id="contact-email" placeholder="e.g. jane@company.com" class="biz-input">
         </div>
       </div>
     </div>
@@ -713,6 +777,27 @@
         <div class="item"><label>Density Level 1 (Compact)</label><div class="stepper"><button class="step-btn minus" onclick="step('density1',-1)">−</button><div class="qty-display" id="density1">0</div><button class="step-btn plus" onclick="step('density1',1)">+</button></div></div>
         <div class="item"><label>Density Level 2 (Standard)</label><div class="stepper"><button class="step-btn minus" onclick="step('density2',-1)">−</button><div class="qty-display" id="density2">0</div><button class="step-btn plus" onclick="step('density2',1)">+</button></div></div>
         <div class="item"><label>Density Level 3 (Wide-Opened)</label><div class="stepper"><button class="step-btn minus" onclick="step('density3',-1)">−</button><div class="qty-display" id="density3">0</div><button class="step-btn plus" onclick="step('density3',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Schedule</div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Day</label>
+          <select id="sched-day" class="biz-input">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Start Time</label>
+          <input type="time" id="sched-start" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">End Time</label>
+          <input type="time" id="sched-end" class="biz-input">
+        </div>
       </div>
     </div>
 
@@ -919,6 +1004,14 @@
           <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Address</label>
           <input type="text" id="w-biz-address" placeholder="e.g. 123 Main St, Suite 400" class="biz-input">
         </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Contact Name</label>
+          <input type="text" id="w-contact-name" placeholder="e.g. Jane Smith" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Contact Email</label>
+          <input type="email" id="w-contact-email" placeholder="e.g. jane@company.com" class="biz-input">
+        </div>
       </div>
     </div>
 
@@ -991,6 +1084,27 @@
         <div class="item"><label>Step Ladder (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ladder_step',-1)">−</button><div class="qty-display" id="w_ladder_step">0</div><button class="step-btn plus" onclick="wStep('w_ladder_step',1)">+</button></div></div>
         <div class="item"><label>Extension Ladder (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_ladder_ext',-1)">−</button><div class="qty-display" id="w_ladder_ext">0</div><button class="step-btn plus" onclick="wStep('w_ladder_ext',1)">+</button></div></div>
         <div class="item"><label>Aerial Lift (per setup)</label><div class="stepper"><button class="step-btn minus" onclick="wStep('w_lift',-1)">−</button><div class="qty-display" id="w_lift">0</div><button class="step-btn plus" onclick="wStep('w_lift',1)">+</button></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Schedule</div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Day</label>
+          <select id="w-sched-day" class="biz-input">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Start Time</label>
+          <input type="time" id="w-sched-start" class="biz-input">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">End Time</label>
+          <input type="time" id="w-sched-end" class="biz-input">
+        </div>
       </div>
     </div>
 
@@ -1463,11 +1577,16 @@
       const el = document.getElementById(k);
       snapshot[k] = el ? (parseInt(el.textContent)||0) : 0;
     });
-    const bizName = document.getElementById('biz-name').value.trim();
+    const bizName    = document.getElementById('biz-name').value.trim();
     const bizAddress = document.getElementById('biz-address').value.trim();
-    const bizSqft = document.getElementById('biz-sqft').value.trim();
-    const sqftVal = parseFloat(bizSqft)||0;
-    const mopPct = Math.min(100, Math.max(0, parseFloat(document.getElementById('mop-pct').value)||0));
+    const bizSqft    = document.getElementById('biz-sqft').value.trim();
+    const sqftVal    = parseFloat(bizSqft)||0;
+    const mopPct     = Math.min(100, Math.max(0, parseFloat(document.getElementById('mop-pct').value)||0));
+    const contactName  = document.getElementById('contact-name').value.trim();
+    const contactEmail = document.getElementById('contact-email').value.trim();
+    const schedDay   = document.getElementById('sched-day').value;
+    const schedStart = document.getElementById('sched-start').value;
+    const schedEnd   = document.getElementById('sched-end').value;
     const inputs = { ...snapshot, sqft:sqftVal, mopPct };
     const { sections, totalSec } = computeSections(snapshot, sqftVal, mopPct);
     const list = loadEstimates();
@@ -1483,11 +1602,28 @@
       list.unshift(est);
       openId = est.id;
     }
+    const janPayload = {
+      business_name: bizName,
+      contact_name: contactName,
+      contact_email: contactEmail,
+      tasks: buildTasksFromSections(sections),
+      total_estimated_minutes: Math.round(totalSec / 60 * 100) / 100,
+      hourly_rate: priceRates.standard,
+      total_cost: Math.round(totalSec / 3600 * priceRates.standard * 100) / 100,
+      schedule: { day_of_week: schedDay, start_time: schedStart, end_time: schedEnd, recurrence: 'weekly' }
+    };
     saveEstimates(list);
     resetForm();
     renderEstimateList();
     showView('estimate', document.getElementById('nav-estimate'));
     setTimeout(() => toggleCard(openId), 50);
+    if (pendingWebhookPayload !== null) {
+      const combined = combinePayloads(pendingWebhookPayload, janPayload);
+      pendingWebhookPayload = null;
+      sendToWebhook(combined);
+    } else {
+      showSubmitModal('janitorial', janPayload);
+    }
   }
 
   function editEstimate(id) {
@@ -1726,8 +1862,13 @@
       const el = document.getElementById(k);
       snapshot[k] = el ? (parseInt(el.textContent)||0) : 0;
     });
-    const bizName = document.getElementById('w-biz-name').value.trim();
-    const bizAddress = document.getElementById('w-biz-address').value.trim();
+    const bizName      = document.getElementById('w-biz-name').value.trim();
+    const bizAddress   = document.getElementById('w-biz-address').value.trim();
+    const contactName  = document.getElementById('w-contact-name').value.trim();
+    const contactEmail = document.getElementById('w-contact-email').value.trim();
+    const schedDay     = document.getElementById('w-sched-day').value;
+    const schedStart   = document.getElementById('w-sched-start').value;
+    const schedEnd     = document.getElementById('w-sched-end').value;
     const inputs = { ...snapshot };
     const { sections, totalSec } = wComputeSections(snapshot);
     const list = wLoadEstimates();
@@ -1743,11 +1884,28 @@
       list.unshift(est);
       openId = est.id;
     }
+    const winPayload = {
+      business_name: bizName,
+      contact_name: contactName,
+      contact_email: contactEmail,
+      tasks: buildTasksFromSections(sections),
+      total_estimated_minutes: Math.round(totalSec / 60 * 100) / 100,
+      hourly_rate: priceRates.standard,
+      total_cost: Math.round(totalSec / 3600 * priceRates.standard * 100) / 100,
+      schedule: { day_of_week: schedDay, start_time: schedStart, end_time: schedEnd, recurrence: 'weekly' }
+    };
     wSaveEstimates(list);
     wResetForm();
     wRenderEstimateList();
     showView('westimate', document.getElementById('nav-westimate'));
     setTimeout(() => wToggleCard(openId), 50);
+    if (pendingWebhookPayload !== null) {
+      const combined = combinePayloads(pendingWebhookPayload, winPayload);
+      pendingWebhookPayload = null;
+      sendToWebhook(combined);
+    } else {
+      showSubmitModal('window', winPayload);
+    }
   }
 
   function wEditEstimate(id) {
@@ -1782,6 +1940,84 @@
     });
     document.getElementById('w-biz-name').value = '';
     document.getElementById('w-biz-address').value = '';
+  }
+
+  // ═══════════════════════════════════════
+  // WEBHOOK
+  // ═══════════════════════════════════════
+
+  let pendingWebhookPayload = null;
+  let _modalPayload = null;
+  let _modalType = null;
+
+  function buildTasksFromSections(sections) {
+    return sections.flatMap(sec => sec.rows.map(row => ({
+      name: row.name,
+      estimated_minutes: Math.round(row.sub / 60 * 100) / 100
+    })));
+  }
+
+  function combinePayloads(first, second) {
+    const tasks = [...first.tasks, ...second.tasks];
+    const total_estimated_minutes = Math.round((first.total_estimated_minutes + second.total_estimated_minutes) * 100) / 100;
+    const total_cost = Math.round(total_estimated_minutes / 60 * first.hourly_rate * 100) / 100;
+    return { ...first, tasks, total_estimated_minutes, total_cost };
+  }
+
+  async function sendToWebhook(payload) {
+    try {
+      const resp = await fetch('https://etmcleaning.app.n8n.cloud/webhook/grand-slam-offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      showWebhookToast(true);
+    } catch (err) {
+      console.error('Webhook failed:', err);
+      showWebhookToast(false, err.message);
+    }
+  }
+
+  function showWebhookToast(ok, msg) {
+    const t = document.getElementById('toast');
+    t.textContent = ok ? 'Sent ✓' : '⚠ Send failed: ' + (msg || 'Unknown error');
+    t.style.background = ok ? '#2e7d32' : '#b94a48';
+    t.style.display = 'block';
+    setTimeout(() => {
+      t.style.display = 'none';
+      t.style.background = '#4D6F9C';
+      t.textContent = 'Settings saved!';
+    }, ok ? 3000 : 6000);
+  }
+
+  function showSubmitModal(type, payload) {
+    _modalType = type;
+    _modalPayload = payload;
+    const other = type === 'janitorial' ? 'Window Cleaning' : 'Janitorial Cleaning';
+    document.getElementById('submit-modal-add-btn').textContent = 'Add ' + other;
+    document.getElementById('submit-modal').style.display = 'flex';
+  }
+
+  function submitModalAddOther() {
+    pendingWebhookPayload = _modalPayload;
+    document.getElementById('submit-modal').style.display = 'none';
+    if (_modalType === 'janitorial') {
+      showView('wcalc', document.getElementById('nav-wcalc'));
+    } else {
+      showView('calc', document.getElementById('nav-calc'));
+    }
+  }
+
+  function submitModalSendNow() {
+    const payload = _modalPayload;
+    document.getElementById('submit-modal').style.display = 'none';
+    sendToWebhook(payload);
+  }
+
+  function submitModalDismiss() {
+    document.getElementById('submit-modal').style.display = 'none';
+    pendingWebhookPayload = null;
   }
 
   // ═══════════════════════════════════════
