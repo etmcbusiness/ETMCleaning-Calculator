@@ -579,6 +579,64 @@
 
     .btn-success { background: #2e7d32; color: #FFFFFF; }
     .btn-success:hover { background: #43a047; }
+
+    /* ── Day picker ── */
+    .day-picker {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .day-btn {
+      padding: 7px 11px;
+      border: 1px solid #9DBEED;
+      border-radius: 20px;
+      background: #FFFFFF;
+      color: #4D6F9C;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .day-btn.selected {
+      background: #4D6F9C;
+      color: #FFFFFF;
+      border-color: #4D6F9C;
+    }
+
+    /* ── Time-type toggle ── */
+    .time-type-toggle {
+      display: flex;
+      margin-top: 6px;
+      border: 1px solid #4D6F9C;
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .time-type-btn {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      background: #FFFFFF;
+      color: #4D6F9C;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .time-type-btn + .time-type-btn {
+      border-left: 1px solid #4D6F9C;
+    }
+
+    .time-type-btn.active {
+      background: #4D6F9C;
+      color: #FFFFFF;
+    }
   </style>
 </head>
 <body>
@@ -787,21 +845,35 @@
 
     <div class="section">
       <div class="section-title">Schedule</div>
-      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Day</label>
-          <select id="sched-day" class="biz-input">
-            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
-          </select>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Days</label>
+          <div class="day-picker" id="sched-days">
+            <button type="button" class="day-btn" data-day="Monday"    onclick="toggleDay(this)">Mon</button>
+            <button type="button" class="day-btn" data-day="Tuesday"   onclick="toggleDay(this)">Tue</button>
+            <button type="button" class="day-btn" data-day="Wednesday" onclick="toggleDay(this)">Wed</button>
+            <button type="button" class="day-btn" data-day="Thursday"  onclick="toggleDay(this)">Thu</button>
+            <button type="button" class="day-btn" data-day="Friday"    onclick="toggleDay(this)">Fri</button>
+            <button type="button" class="day-btn" data-day="Saturday"  onclick="toggleDay(this)">Sat</button>
+            <button type="button" class="day-btn" data-day="Sunday"    onclick="toggleDay(this)">Sun</button>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Start Time</label>
-          <input type="time" id="sched-start" class="biz-input">
+        <div>
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Time</label>
+          <div class="time-type-toggle" id="sched-time-type" data-current="exact">
+            <button type="button" class="time-type-btn active" data-type="exact" onclick="setTimeType('sched','exact')">Exact Time</button>
+            <button type="button" class="time-type-btn"        data-type="range" onclick="setTimeType('sched','range')">Time Range</button>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">End Time</label>
-          <input type="time" id="sched-end" class="biz-input">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label id="sched-start-label" style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Start Time</label>
+            <input type="time" id="sched-start" class="biz-input">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label id="sched-end-label" style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">End Time</label>
+            <input type="time" id="sched-end" class="biz-input">
+          </div>
         </div>
       </div>
     </div>
@@ -1094,21 +1166,35 @@
 
     <div class="section">
       <div class="section-title">Schedule</div>
-      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Day</label>
-          <select id="w-sched-day" class="biz-input">
-            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
-          </select>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Days</label>
+          <div class="day-picker" id="w-sched-days">
+            <button type="button" class="day-btn" data-day="Monday"    onclick="toggleDay(this)">Mon</button>
+            <button type="button" class="day-btn" data-day="Tuesday"   onclick="toggleDay(this)">Tue</button>
+            <button type="button" class="day-btn" data-day="Wednesday" onclick="toggleDay(this)">Wed</button>
+            <button type="button" class="day-btn" data-day="Thursday"  onclick="toggleDay(this)">Thu</button>
+            <button type="button" class="day-btn" data-day="Friday"    onclick="toggleDay(this)">Fri</button>
+            <button type="button" class="day-btn" data-day="Saturday"  onclick="toggleDay(this)">Sat</button>
+            <button type="button" class="day-btn" data-day="Sunday"    onclick="toggleDay(this)">Sun</button>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Start Time</label>
-          <input type="time" id="w-sched-start" class="biz-input">
+        <div>
+          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Time</label>
+          <div class="time-type-toggle" id="w-sched-time-type" data-current="exact">
+            <button type="button" class="time-type-btn active" data-type="exact" onclick="setTimeType('w-sched','exact')">Exact Time</button>
+            <button type="button" class="time-type-btn"        data-type="range" onclick="setTimeType('w-sched','range')">Time Range</button>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">End Time</label>
-          <input type="time" id="w-sched-end" class="biz-input">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label id="w-sched-start-label" style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Start Time</label>
+            <input type="time" id="w-sched-start" class="biz-input">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label id="w-sched-end-label" style="font-size:0.8rem;color:#999999;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">End Time</label>
+            <input type="time" id="w-sched-end" class="biz-input">
+          </div>
         </div>
       </div>
     </div>
@@ -1589,9 +1675,6 @@
     const mopPct     = Math.min(100, Math.max(0, parseFloat(document.getElementById('mop-pct').value)||0));
     const contactName  = document.getElementById('contact-name').value.trim();
     const contactEmail = document.getElementById('contact-email').value.trim();
-    const schedDay   = document.getElementById('sched-day').value;
-    const schedStart = document.getElementById('sched-start').value;
-    const schedEnd   = document.getElementById('sched-end').value;
     const inputs = { ...snapshot, sqft:sqftVal, mopPct };
     const { sections, totalSec } = computeSections(snapshot, sqftVal, mopPct);
     const list = loadEstimates();
@@ -1615,7 +1698,7 @@
       total_estimated_minutes: Math.round(totalSec / 60 * 100) / 100,
       hourly_rate: priceRates.standard,
       total_cost: Math.round(totalSec / 3600 * priceRates.standard * 100) / 100,
-      schedule: { day_of_week: schedDay, start_time: schedStart, end_time: schedEnd, recurrence: 'weekly' }
+      schedule: getSchedulePayload('sched')
     };
     saveEstimates(list);
     resetForm();
@@ -1871,9 +1954,6 @@
     const bizAddress   = document.getElementById('w-biz-address').value.trim();
     const contactName  = document.getElementById('w-contact-name').value.trim();
     const contactEmail = document.getElementById('w-contact-email').value.trim();
-    const schedDay     = document.getElementById('w-sched-day').value;
-    const schedStart   = document.getElementById('w-sched-start').value;
-    const schedEnd     = document.getElementById('w-sched-end').value;
     const inputs = { ...snapshot };
     const { sections, totalSec } = wComputeSections(snapshot);
     const list = wLoadEstimates();
@@ -1897,7 +1977,7 @@
       total_estimated_minutes: Math.round(totalSec / 60 * 100) / 100,
       hourly_rate: priceRates.standard,
       total_cost: Math.round(totalSec / 3600 * priceRates.standard * 100) / 100,
-      schedule: { day_of_week: schedDay, start_time: schedStart, end_time: schedEnd, recurrence: 'weekly' }
+      schedule: getSchedulePayload('w-sched')
     };
     wSaveEstimates(list);
     wResetForm();
@@ -1945,6 +2025,39 @@
     });
     document.getElementById('w-biz-name').value = '';
     document.getElementById('w-biz-address').value = '';
+  }
+
+  // ═══════════════════════════════════════
+  // SCHEDULE UI
+  // ═══════════════════════════════════════
+
+  function toggleDay(btn) {
+    btn.classList.toggle('selected');
+  }
+
+  function setTimeType(prefix, type) {
+    const toggle = document.getElementById(prefix + '-time-type');
+    toggle.dataset.current = type;
+    toggle.querySelectorAll('.time-type-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === type);
+    });
+    const isRange = type === 'range';
+    document.getElementById(prefix + '-start-label').textContent = isRange ? 'Earliest Start' : 'Start Time';
+    document.getElementById(prefix + '-end-label').textContent   = isRange ? 'Latest End'     : 'End Time';
+  }
+
+  function getSchedulePayload(prefix) {
+    const picker = document.getElementById(prefix + '-days');
+    const days = [...picker.querySelectorAll('.day-btn.selected')].map(b => b.dataset.day);
+    const toggle = document.getElementById(prefix + '-time-type');
+    const timeType = toggle ? toggle.dataset.current || 'exact' : 'exact';
+    return {
+      days,
+      time_type: timeType,
+      start_time: document.getElementById(prefix + '-start').value,
+      end_time:   document.getElementById(prefix + '-end').value,
+      recurrence: 'weekly'
+    };
   }
 
   // ═══════════════════════════════════════
